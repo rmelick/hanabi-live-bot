@@ -1,0 +1,36 @@
+GameState
+ - Draw Pile
+ - Clue Pile
+ - Explosions Pile
+ - [Player State]
+
+Tile
+ - Color
+ - Rank
+ - [clues given]
+
+Clue
+ - color OR rank
+
+Deck
+ of each color (red, white, blue, green, yellow, rainbow)
+ 1 5
+ 2 4
+ 2 3
+ 2 2
+ 3 1
+
+Clues
+ 8
+
+Explosions
+ 3
+
+Deal
+ 2-3 players - 5 tiles
+ 4-5 players - 4 tiles
+
+Actions
+ - Clue (player and color/number)
+ - Play (position)
+ - Discard (position)
