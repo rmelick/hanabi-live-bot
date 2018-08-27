@@ -7,11 +7,13 @@ public class Tile {
     private final Color _color;
     private final Rank _rank;
     private final String _id;
+    private final String _publicId;
 
     public Tile(Color color, Rank rank, int number) {
       _color = color;
       _rank = rank;
       _id = String.format("%s-%s-%s", color, rank, number);
+      _publicId = "public-" + _id;
     }
 
   @Override public String toString() {
