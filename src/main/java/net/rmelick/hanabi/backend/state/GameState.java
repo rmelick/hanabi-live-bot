@@ -44,6 +44,22 @@ public class GameState {
     _playerStates.get(playerIndex).receiveTile(nextTile);
   }
 
+  public AtomicLong getCluesRemaining() {
+    return _cluesRemaining;
+  }
+
+  public AtomicLong getMistakesRemaining() {
+    return _mistakesRemaining;
+  }
+
+  public List<PlayerState> getPlayerStates() {
+    return _playerStates;
+  }
+
+  public DrawPile getDrawPile() {
+    return _drawPile;
+  }
+
   @Override
   public String toString() {
     StringBuilder gameState = new StringBuilder();

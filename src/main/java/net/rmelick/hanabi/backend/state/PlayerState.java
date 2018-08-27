@@ -9,10 +9,12 @@ import java.util.List;
  *
  */
 public class PlayerState {
+  private final String _name;
   private final int _playerIndex;
   private final List<Tile> _tiles;
 
   public PlayerState(int playerIndex) {
+    _name = "Player " + playerIndex;
     _playerIndex = playerIndex;
     _tiles = new ArrayList<>();
   }
@@ -27,6 +29,18 @@ public class PlayerState {
 
   public Tile removeTile(int tilePosition) {
     return _tiles.remove(tilePosition);
+  }
+
+  public String getName() {
+    return _name;
+  }
+
+  public int getPlayerIndex() {
+    return _playerIndex;
+  }
+
+  public List<Tile> getTiles() {
+    return _tiles;
   }
 
   @Override public String toString() {
