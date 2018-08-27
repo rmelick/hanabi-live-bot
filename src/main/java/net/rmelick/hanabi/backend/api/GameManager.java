@@ -1,4 +1,6 @@
-package net.rmelick.hanabi.backend;
+package net.rmelick.hanabi.backend.api;
+
+import net.rmelick.hanabi.backend.Clue;
 
 /**
  *

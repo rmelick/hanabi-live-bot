@@ -1,8 +1,7 @@
 package net.rmelick.hanabi.backend;
 
+import net.rmelick.hanabi.backend.api.GameManager;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  *
