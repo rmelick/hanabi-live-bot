@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  */
 public class GameState {
-  private final AtomicLong _cluesRemaining = new AtomicLong(8);
+  private static final int MAX_CLUES = 8;
+  private final AtomicLong _cluesRemaining = new AtomicLong(MAX_CLUES);
   private final AtomicLong _mistakesRemaining = new AtomicLong(3);
   private final List<PlayerState> _playerStates = new ArrayList<>();
   private final DrawPileState _drawPileState = new DrawPileState();
@@ -49,6 +50,9 @@ public class GameState {
   public void discard(int playerIndex, int positionToDiscard) {
     Tile discardedTile = _playerStates.get(playerIndex).removeTile(positionToDiscard);
     _discardPileState.discard(discardedTile);
+    if (_cluesRemaining.get() < MAX_CLUES) {
+      _cluesRemaining.incrementAndGet();
+    }
     draw(playerIndex);
   }
 
