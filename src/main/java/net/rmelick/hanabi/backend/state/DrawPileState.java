@@ -11,7 +11,7 @@ import java.util.List;
 /**
  *
  */
-public class DrawPile {
+public class DrawPileState {
   private final List<Tile> _tiles = newRandomList();
 
   private static List<Tile> newRandomList() {
