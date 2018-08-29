@@ -14,4 +14,8 @@ public class ViewableGameState {
   @JsonProperty("discard_pile")
   public DiscardPile discardPile;
   public Board board;
+  @JsonProperty("clues_remaining")
+  public int cluesRemaining;
+  @JsonProperty("mistakes_remaining")
+  public int mistakesRemaining;
 }

@@ -44,6 +44,8 @@ public class HanabiController {
     externalGameState.drawPile = convertInternalDrawPile(internalGameState.getDrawPileState());
     externalGameState.discardPile = convertInternalDiscardPile(internalGameState.getDiscardPileState());
     externalGameState.board = convertInternalBoard(internalGameState.getBoardState());
+    externalGameState.cluesRemaining = (int) internalGameState.getCluesRemaining().get();
+    externalGameState.mistakesRemaining = (int) internalGameState.getMistakesRemaining().get();
     return externalGameState;
   }
 
