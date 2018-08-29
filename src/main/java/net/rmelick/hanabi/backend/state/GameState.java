@@ -52,6 +52,15 @@ public class GameState {
     draw(playerIndex);
   }
 
+  public void play(int playerIndex, int positionToPlay) {
+    Tile tileToPlay = _playerStates.get(playerIndex).removeTile(positionToPlay);
+    boolean successfullyPlayed = _boardState.play(tileToPlay);
+    if (!successfullyPlayed) {
+      _mistakesRemaining.decrementAndGet();
+    }
+    draw(playerIndex);
+  }
+
   public AtomicLong getCluesRemaining() {
     return _cluesRemaining;
   }

@@ -2,6 +2,8 @@ package net.rmelick.hanabi.backend.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.rmelick.hanabi.backend.Color;
+import net.rmelick.hanabi.backend.Rank;
 import net.rmelick.hanabi.backend.api.Board;
 import net.rmelick.hanabi.backend.api.DiscardPile;
 import net.rmelick.hanabi.backend.api.DrawPile;
@@ -48,8 +50,8 @@ public class HanabiController {
   private Board convertInternalBoard(BoardState internalBoardState) {
     Board externalBoard = new Board();
     externalBoard.playedTiles = new HashMap<>();
-    for (Map.Entry<String, List<net.rmelick.hanabi.backend.Tile>> entry : internalBoardState.getPlayedTiles().entrySet()) {
-      externalBoard.playedTiles.put(entry.getKey(), convertInternalTilesFullInfo(entry.getValue()));
+    for (Map.Entry<Color, List<net.rmelick.hanabi.backend.Tile>> entry : internalBoardState.getPlayedTiles().entrySet()) {
+      externalBoard.playedTiles.put(entry.getKey().getPrettyName(), convertInternalTilesFullInfo(entry.getValue()));
     }
     return externalBoard;
   }
@@ -111,6 +113,21 @@ public class HanabiController {
 
   private GameState newRandomGameState() {
     GameState gameState = new GameState(4);
+    boolean played = false;
+    for (PlayerState player : gameState.getPlayerStates()) {
+      int tilePosition = 0;
+      for (net.rmelick.hanabi.backend.Tile tile : player.getTiles()) {
+        if (Rank.ONE.equals(tile.getRank())) {
+          gameState.play(player.getPlayerIndex(), tilePosition);
+          played = true;
+          break;
+        }
+        tilePosition++;
+      }
+      if (played) {
+        break;
+      }
+    }
     gameState.discard(0, 0);
     gameState.discard(1, 0);
     gameState.discard(2, 0);
