@@ -12,8 +12,8 @@ public class GameManager {
     private final ConcurrentHashMap<String, FullGameState> _currentGames = new ConcurrentHashMap<>();
 
     public String createGame(int numPlayers) {
-        String gameId = UUID.randomUUID().toString();
         FullGameState game = new FullGameState(numPlayers);
+        String gameId = game.getGameId();
         _currentGames.put(gameId, game);
         return gameId;
     }

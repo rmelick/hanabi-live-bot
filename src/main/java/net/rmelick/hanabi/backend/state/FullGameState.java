@@ -4,6 +4,7 @@ import net.rmelick.hanabi.backend.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -17,6 +18,7 @@ public class FullGameState {
   private final DrawPileState _drawPileState = new DrawPileState();
   private final DiscardPileState _discardPileState = new DiscardPileState();
   private final BoardState _boardState = new BoardState();
+  private final String _gameId = UUID.randomUUID().toString();
   private final int _numPlayers;
   private int _currentPlayerIndex;
   private PlayerState _currentPlayer;
@@ -41,6 +43,10 @@ public class FullGameState {
         unsafeDrawOffTurn(player.getId());
       }
     }
+  }
+
+  public String getGameId() {
+    return _gameId;
   }
 
   private PlayerState getPlayer(String playerId) {

@@ -19,6 +19,7 @@ public class InternalToExternalAdapter {
      */
     public static ViewableGameState convertInternalGameState(FullGameState internalGameState, String playerId) {
         ViewableGameState externalGameState = new ViewableGameState();
+        externalGameState.gameId = internalGameState.getGameId();
         externalGameState.players = convertInternalPlayers(internalGameState.getPlayerStates(), playerId);
         externalGameState.drawPile = convertInternalDrawPile(internalGameState.getDrawPileState());
         externalGameState.discardPile = convertInternalDiscardPile(internalGameState.getDiscardPileState());

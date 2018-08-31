@@ -8,6 +8,8 @@ import java.util.List;
  *
  */
 public class ViewableGameState {
+  @JsonProperty("game_id")
+  public String gameId;
   public List<Player> players;
   @JsonProperty("draw_pile")
   public DrawPile drawPile;
