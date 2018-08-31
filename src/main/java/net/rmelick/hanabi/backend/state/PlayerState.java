@@ -4,11 +4,13 @@ import net.rmelick.hanabi.backend.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
  */
 public class PlayerState {
+  private final String _id;
   private final String _name;
   private final int _playerIndex;
   private final List<Tile> _tiles;
@@ -17,6 +19,7 @@ public class PlayerState {
     _name = "Player " + playerIndex;
     _playerIndex = playerIndex;
     _tiles = new ArrayList<>();
+    _id = UUID.randomUUID().toString();
   }
 
   /**
@@ -37,6 +40,10 @@ public class PlayerState {
 
   public int getPlayerIndex() {
     return _playerIndex;
+  }
+
+  public String getId() {
+    return _id;
   }
 
   public List<Tile> getTiles() {
