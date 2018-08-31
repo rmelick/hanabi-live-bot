@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  *
  */
-public class GameState {
+public class FullGameState {
   private final AtomicLong _cluesRemaining = new AtomicLong(8);
   private final AtomicLong _mistakesRemaining = new AtomicLong(3);
   private final List<PlayerState> _playerStates = new ArrayList<>();
@@ -17,48 +17,96 @@ public class GameState {
   private final DiscardPileState _discardPileState = new DiscardPileState();
   private final BoardState _boardState = new BoardState();
   private final int _numPlayers;
-  private int _currentPlayer;
+  private int _currentPlayerIndex;
+  private PlayerState _currentPlayer;
 
-  public GameState(int numPlayers) {
+  public FullGameState(int numPlayers) {
     if (numPlayers < 2) {
       throw new IllegalArgumentException("not enough players");
     } else if (numPlayers > 5) {
       throw new IllegalArgumentException("too many players");
     }
     _numPlayers = numPlayers;
-    _currentPlayer = 0;
 
     for(int playerIndex = 0; playerIndex < _numPlayers; playerIndex++) {
       _playerStates.add(new PlayerState(playerIndex));
     }
+    _currentPlayerIndex = 0;
+    _currentPlayer = _playerStates.get(_currentPlayerIndex);
 
     int tilesToDraw = numPlayers <= 3 ? 5 : 4;
-    for(int playerIndex = 0; playerIndex < _numPlayers; playerIndex++) {
+    for(PlayerState player : _playerStates) {
       for (int i = 0; i < tilesToDraw; i++) {
-        draw(playerIndex);
+        unsafeDrawOffTurn(player.getId());
       }
     }
-
   }
 
-  public void draw(int playerIndex) {
+  private PlayerState getPlayer(String playerId) {
+    for (PlayerState player : _playerStates) {
+      if (player.getId().equals(playerId)) {
+        return player;
+      }
+    }
+    throw new IllegalArgumentException("Could not find player " + playerId);
+  }
+
+  private void checkIsTurn(String playerId) {
+    if (!_currentPlayer.getId().equals(playerId)) {
+      throw new IllegalStateException("Not the players turn: " + playerId);
+    }
+  }
+
+  public void draw(String playerId) {
+    checkIsTurn(playerId);
+    unsafeDraw(playerId);
+  }
+
+  // do not check if it is allowed
+  private void unsafeDraw(String playerId) {
+    unsafeDrawOffTurn(playerId);
+    advanceTurn();
+  }
+
+  // internal draw for specific player that does not advance the turn
+  private void unsafeDrawOffTurn(String playerId) {
     Tile nextTile = _drawPileState.drawTile();
-    _playerStates.get(playerIndex).receiveTile(nextTile);
+    getPlayer(playerId).receiveTile(nextTile);
   }
 
-  public void discard(int playerIndex, int positionToDiscard) {
-    Tile discardedTile = _playerStates.get(playerIndex).removeTile(positionToDiscard);
+  public void discard(String playerId, int positionToDiscard) {
+    checkIsTurn(playerId);
+    unsafeDiscard(playerId, positionToDiscard);
+  }
+
+  public void unsafeDiscard(String playerId, int positionToDiscard) {
+    Tile discardedTile = getPlayer(playerId).removeTile(positionToDiscard);
     _discardPileState.discard(discardedTile);
-    draw(playerIndex);
+    draw(playerId);
   }
 
-  public void play(int playerIndex, int positionToPlay) {
-    Tile tileToPlay = _playerStates.get(playerIndex).removeTile(positionToPlay);
+  public void play(String playerId, int positionToPlay) {
+    checkIsTurn(playerId);
+    unsafePlayOffTurn(playerId, positionToPlay);
+    advanceTurn();
+  }
+
+  public void unsafePlayOffTurn(String playerId, int positionToPlay) {
+    Tile tileToPlay = getPlayer(playerId).removeTile(positionToPlay);
     boolean successfullyPlayed = _boardState.play(tileToPlay);
     if (!successfullyPlayed) {
       _mistakesRemaining.decrementAndGet();
     }
-    draw(playerIndex);
+    unsafeDrawOffTurn(playerId);
+  }
+
+  private void advanceTurn() {
+    _currentPlayerIndex += 1;
+    if (_currentPlayerIndex >= _numPlayers) {
+      _currentPlayerIndex = 0;
+    }
+    _currentPlayer = _playerStates.get(_currentPlayerIndex);
+    // TODO notify outwards that the turn is over?
   }
 
   public AtomicLong getCluesRemaining() {
@@ -67,6 +115,10 @@ public class GameState {
 
   public AtomicLong getMistakesRemaining() {
     return _mistakesRemaining;
+  }
+
+  public PlayerState getCurrentPlayerState() {
+    return _playerStates.get(_currentPlayerIndex);
   }
 
   public List<PlayerState> getPlayerStates() {
