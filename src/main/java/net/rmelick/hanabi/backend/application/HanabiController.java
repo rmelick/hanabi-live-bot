@@ -25,9 +25,6 @@ public class HanabiController {
     FullGameState fullGameState = newRandomGameState();
     String currentPlayer = fullGameState.getCurrentPlayerState().getId();
     ViewableGameState gameState = InternalToExternalAdapter.convertInternalGameState(fullGameState, currentPlayer);
-   //
-    //externalGameState.cluesRemaining = (int) internalGameState.getCluesRemaining().get();
-    //externalGameState.mistakesRemaining = (int) internalGameState.getMistakesRemaining().get();
     return new ObjectMapper().writeValueAsString(gameState);
   }
 
