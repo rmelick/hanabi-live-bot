@@ -6,9 +6,11 @@ import net.rmelick.hanabi.backend.api.*;
 import net.rmelick.hanabi.backend.state.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InternalToExternalAdapter {
     /**
@@ -20,7 +22,7 @@ public class InternalToExternalAdapter {
     public static ViewableGameState convertInternalGameState(FullGameState internalGameState, String playerId) {
         ViewableGameState externalGameState = new ViewableGameState();
         externalGameState.gameId = internalGameState.getGameId();
-        externalGameState.players = convertInternalPlayers(internalGameState.getPlayerStates(), playerId);
+        externalGameState.players = convertInternalPlayers(internalGameState, playerId);
         externalGameState.drawPile = convertInternalDrawPile(internalGameState.getDrawPileState());
         externalGameState.discardPile = convertInternalDiscardPile(internalGameState.getDiscardPileState());
         externalGameState.board = convertInternalBoard(internalGameState.getBoardState());
@@ -50,20 +52,39 @@ public class InternalToExternalAdapter {
         return externalDrawPile;
     }
 
-    private static List<Player> convertInternalPlayers(List<PlayerState> internalPlayers, String playerId) {
-        List<Player> externalPlayers = new ArrayList<>(internalPlayers.size());
-        for (PlayerState internalPlayer : internalPlayers) {
+    private static Players convertInternalPlayers(FullGameState internalGameState, String thisPlayerId) {
+        String currentPlayerId = internalGameState.getCurrentPlayerState().getId();
+        List<PlayerState> internalPlayers = new ArrayList<>(internalGameState.getPlayerStates());
+        int thisPlayerIndex = internalGameState.getPlayer(thisPlayerId).getPlayerIndex();
+        // rotate 'this player' to front of array
+        Collections.rotate(internalPlayers, -thisPlayerIndex);
+        PlayerState thisPlayer = internalPlayers.remove(0);
+
+        Players players = new Players();
+        players.thisPlayer = convertInternalThisPlayer(thisPlayer, currentPlayerId);
+        players.otherPlayers = convertInternalOtherPlayers(internalPlayers, currentPlayerId);
+        return players;
+    }
+
+    private static Player convertInternalThisPlayer(PlayerState playerState, String currentPlayerId) {
+        Player thisPlayer = new Player();
+        thisPlayer.name = playerState.getName();
+        thisPlayer.id = playerState.getId();
+        thisPlayer.playerIndex = playerState.getPlayerIndex();
+        thisPlayer.isCurrentPlayer = playerState.getId().equals(currentPlayerId);
+        thisPlayer.tiles = convertInternalTilesCurrentPlayer(playerState.getTiles());
+        return thisPlayer;
+    }
+
+    private static List<Player> convertInternalOtherPlayers(List<PlayerState> otherPlayers, String currentPlayerId) {
+        List<Player> externalPlayers = new ArrayList<>(otherPlayers.size());
+        for (PlayerState internalPlayer : otherPlayers) {
             Player externalPlayer = new Player();
             externalPlayer.name = internalPlayer.getName();
+            externalPlayer.id = internalPlayer.getId();
             externalPlayer.playerIndex = internalPlayer.getPlayerIndex();
-
-            if (internalPlayer.getId().equals(playerId)) {
-                externalPlayer.isCurrentPlayer = true;
-                externalPlayer.tiles = convertInternalTilesCurrentPlayer(internalPlayer.getTiles());
-            } else {
-                externalPlayer.isCurrentPlayer = false;
-                externalPlayer.tiles = convertInternalTilesFullInfo(internalPlayer.getTiles());
-            }
+            externalPlayer.isCurrentPlayer = internalPlayer.getId().equals(currentPlayerId);
+            externalPlayer.tiles = convertInternalTilesFullInfo(internalPlayer.getTiles());
             externalPlayers.add(externalPlayer);
         }
         return externalPlayers;

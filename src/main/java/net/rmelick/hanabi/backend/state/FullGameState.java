@@ -49,7 +49,7 @@ public class FullGameState {
     return _gameId;
   }
 
-  private PlayerState getPlayer(String playerId) {
+  public PlayerState getPlayer(String playerId) {
     for (PlayerState player : _playerStates) {
       if (player.getId().equals(playerId)) {
         return player;

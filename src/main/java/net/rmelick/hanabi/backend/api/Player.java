@@ -16,4 +16,5 @@ public class Player {
   public boolean isCurrentPlayer;
   @JsonProperty("tiles")
   public List<Tile> tiles;
+  public String id;
 }
