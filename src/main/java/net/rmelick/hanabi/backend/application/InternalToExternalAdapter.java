@@ -157,10 +157,6 @@ public class InternalToExternalAdapter {
     }
 
     private static AvailableMoves computeAvailableMoves(String playerId, FullGameState internalGameState) {
-      if (!playerId.equals(internalGameState.getCurrentPlayerState().getId())) {
-        return emptyAvailableMoves();
-      }
-
       // discards and plays are always available for all of your tiles
       AvailableMoves availableMoves = new AvailableMoves();
       List<TileInHand> playerTiles = internalGameState.getPlayer(playerId).getTilesInHand();

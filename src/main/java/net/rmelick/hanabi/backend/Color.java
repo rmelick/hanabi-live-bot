@@ -24,4 +24,13 @@ public enum Color {
   @Override public String toString() {
     return getPrettyName();
   }
+
+  public static Color fromPrettyName(String prettyName) {
+    for (Color color : Color.values()) {
+      if (color.getPrettyName().equals(prettyName)) {
+        return color;
+      }
+    }
+    throw new IllegalArgumentException("Unknown color " + prettyName);
+  }
 }

@@ -126,10 +126,10 @@ public class FullGameState {
 
   private void applyHint(Hint hint, PlayerState player) {
     for (TileInHand tileInHand : player.getTilesInHand()) {
-      if (hint.getColorHint().equals(tileInHand.getTile().getColor())) {
+      if (Hint.HintType.COLOR.equals(hint.getHintType()) && hint.getColorHint().equals(tileInHand.getTile().getColor())) {
         tileInHand.addMatchingHint(hint);
       }
-      else if (hint.getRankHint().equals(tileInHand.getTile().getRank())) {
+      else if (Hint.HintType.RANK.equals(hint.getHintType()) && hint.getRankHint().equals(tileInHand.getTile().getRank())) {
         tileInHand.addMatchingHint(hint);
       } else {
         tileInHand.addNonMatchingHint(hint);
