@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.backend.GameManager;
 import net.rmelick.hanabi.backend.Rank;
 import net.rmelick.hanabi.backend.api.*;
-import net.rmelick.hanabi.backend.api.input.Move;
 import net.rmelick.hanabi.backend.state.FullGameState;
 import net.rmelick.hanabi.backend.state.PlayerState;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,13 +47,23 @@ public class HanabiController {
   }
 
   @RequestMapping(value = "/games/{gameId}/state", method = RequestMethod.GET)
-  public ViewableGameState getGameState(@PathVariable String gameId, @RequestParam String playerId) {
+  public ViewableGameState getGameState(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId) {
     FullGameState fullGameState = _gameManager.getGame(gameId);
     return InternalToExternalAdapter.convertInternalGameState(fullGameState, playerId);
   }
 
-  @RequestMapping(value = "/games/{gameId}/makeMove", method = RequestMethod.POST)
-  public void makeMove(@PathVariable String gameId, @RequestBody Move move) {
+  @RequestMapping(value = "/games/{gameId}/move/play", method = RequestMethod.POST)
+  public void makeMove(@PathVariable String gameId, @RequestBody PlayMove move) {
+
+  }
+
+  @RequestMapping(value = "/games/{gameId}/move/discard", method = RequestMethod.POST)
+  public void makeMove(@PathVariable String gameId, @RequestBody DiscardMove move) {
+
+  }
+
+  @RequestMapping(value = "/games/{gameId}/move/hint", method = RequestMethod.POST)
+  public void makeMove(@PathVariable String gameId, @RequestBody HintMove move) {
 
   }
 
