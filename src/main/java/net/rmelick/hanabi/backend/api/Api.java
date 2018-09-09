@@ -1,6 +1,6 @@
 package net.rmelick.hanabi.backend.api;
 
-import net.rmelick.hanabi.backend.Clue;
+import net.rmelick.hanabi.backend.Hint;
 
 /**
  *
@@ -12,7 +12,7 @@ public interface Api {
   // all of the methods below require your session to be in an active game already
   void startGame();
 
-  void giveClue(int toPlayer, Clue clue);
+  void giveClue(int toPlayer, Hint hint);
 
   void play(int positionToPlay);
 

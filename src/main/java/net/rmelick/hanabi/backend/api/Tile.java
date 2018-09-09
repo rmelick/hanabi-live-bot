@@ -2,6 +2,8 @@ package net.rmelick.hanabi.backend.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 /**
  *
  */
@@ -14,4 +16,6 @@ public class Tile {
   public String color;
   @JsonProperty("rank")
   public int rank;
+  @JsonProperty("hint_information")
+  public HintInformation hintInformation;
 }

@@ -13,7 +13,7 @@ public class PlayerState {
   private final String _id;
   private final String _name;
   private final int _playerIndex;
-  private final List<Tile> _tiles;
+  private final List<TileInHand> _tiles;
 
   public PlayerState(int playerIndex) {
     _name = "Player " + playerIndex;
@@ -27,11 +27,11 @@ public class PlayerState {
    * @param tile
    */
   public void receiveTile(Tile tile) {
-    _tiles.add(tile);
+    _tiles.add(new TileInHand(tile));
   }
 
   public Tile removeTile(int tilePosition) {
-    return _tiles.remove(tilePosition);
+    return _tiles.remove(tilePosition).getTile();
   }
 
   public String getName() {
@@ -46,7 +46,7 @@ public class PlayerState {
     return _id;
   }
 
-  public List<Tile> getTiles() {
+  public List<TileInHand> getTilesInHand() {
     return _tiles;
   }
 

@@ -20,7 +20,17 @@ public enum Rank {
     return _value;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return String.valueOf(_value);
+  }
+
+  public static Rank fromInt(int value) {
+    for (Rank rank : Rank.values()) {
+      if (rank.getValue() == value) {
+        return rank;
+      }
+    }
+    throw new IllegalArgumentException("Illegal rank value " + value);
   }
 }

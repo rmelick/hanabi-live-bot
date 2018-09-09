@@ -1,5 +1,6 @@
 package net.rmelick.hanabi.backend.state;
 
+import net.rmelick.hanabi.backend.Hint;
 import net.rmelick.hanabi.backend.Tile;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class FullGameState {
     }
   }
 
-  public void draw(String playerId) {
+  private void draw(String playerId) {
     checkIsTurn(playerId);
     unsafeDraw(playerId);
   }
@@ -86,7 +87,7 @@ public class FullGameState {
     unsafeDiscard(playerId, positionToDiscard);
   }
 
-  public void unsafeDiscard(String playerId, int positionToDiscard) {
+  private void unsafeDiscard(String playerId, int positionToDiscard) {
     Tile discardedTile = getPlayer(playerId).removeTile(positionToDiscard);
     _discardPileState.discard(discardedTile);
     if (_cluesRemaining.get() < MAX_CLUES) {
@@ -101,13 +102,39 @@ public class FullGameState {
     advanceTurn();
   }
 
-  public void unsafePlayOffTurn(String playerId, int positionToPlay) {
+  private void unsafePlayOffTurn(String playerId, int positionToPlay) {
     Tile tileToPlay = getPlayer(playerId).removeTile(positionToPlay);
     boolean successfullyPlayed = _boardState.play(tileToPlay);
     if (!successfullyPlayed) {
       _mistakesRemaining.decrementAndGet();
     }
     unsafeDrawOffTurn(playerId);
+  }
+
+  public void hint(String playerId, String recipientPlayerId, Hint hint) {
+    checkIsTurn(playerId);
+    checkCluesAvailable();
+    applyHint(hint, getPlayer(recipientPlayerId));
+    advanceTurn();
+  }
+
+  private void checkCluesAvailable() {
+    if (_cluesRemaining.get() <= 0) {
+      throw new IllegalStateException("No clues remaining");
+    }
+  }
+
+  private void applyHint(Hint hint, PlayerState player) {
+    for (TileInHand tileInHand : player.getTilesInHand()) {
+      if (hint.getColorHint().equals(tileInHand.getTile().getColor())) {
+        tileInHand.addMatchingHint(hint);
+      }
+      else if (hint.getRankHint().equals(tileInHand.getTile().getRank())) {
+        tileInHand.addMatchingHint(hint);
+      } else {
+        tileInHand.addNonMatchingHint(hint);
+      }
+    }
   }
 
   private void advanceTurn() {

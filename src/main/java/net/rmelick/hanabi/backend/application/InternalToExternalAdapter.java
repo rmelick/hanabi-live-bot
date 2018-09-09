@@ -1,6 +1,7 @@
 package net.rmelick.hanabi.backend.application;
 
 import net.rmelick.hanabi.backend.Color;
+import net.rmelick.hanabi.backend.Hint;
 import net.rmelick.hanabi.backend.Tile;
 import net.rmelick.hanabi.backend.api.*;
 import net.rmelick.hanabi.backend.state.*;
@@ -74,7 +75,7 @@ public class InternalToExternalAdapter {
         thisPlayer.id = playerState.getId();
         thisPlayer.playerIndex = playerState.getPlayerIndex();
         thisPlayer.isCurrentPlayer = playerState.getId().equals(currentPlayerId);
-        thisPlayer.tiles = convertInternalTilesCurrentPlayer(playerState.getTiles());
+        thisPlayer.tiles = convertInternalTilesInHandCurrentPlayer(playerState.getTilesInHand());
         return thisPlayer;
     }
 
@@ -86,33 +87,73 @@ public class InternalToExternalAdapter {
             externalPlayer.id = internalPlayer.getId();
             externalPlayer.playerIndex = internalPlayer.getPlayerIndex();
             externalPlayer.isCurrentPlayer = internalPlayer.getId().equals(currentPlayerId);
-            externalPlayer.tiles = convertInternalTilesFullInfo(internalPlayer.getTiles());
+            externalPlayer.tiles = convertInternalTilesInHandFullInfo(internalPlayer.getTilesInHand());
             externalPlayers.add(externalPlayer);
         }
         return externalPlayers;
     }
 
-    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesFullInfo(List<net.rmelick.hanabi.backend.Tile> internalTiles) {
+    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesInHandFullInfo(List<TileInHand> internalTiles) {
         List<net.rmelick.hanabi.backend.api.Tile> externalTiles = new ArrayList<>(internalTiles.size());
-        for (net.rmelick.hanabi.backend.Tile internalTile : internalTiles) {
+        for (TileInHand tileInHand : internalTiles) {
+            Tile internalTile = tileInHand.getTile();
             net.rmelick.hanabi.backend.api.Tile externalTile = new net.rmelick.hanabi.backend.api.Tile();
             externalTile.color = internalTile.getColor().getPrettyName();
             externalTile.id = internalTile.getId();
             externalTile.publicId = internalTile.getPublicId();
             externalTile.rank = internalTile.getRank().getValue();
+            externalTile.hintInformation = convertInternalHints(tileInHand);
             externalTiles.add(externalTile);
         }
         return externalTiles;
     }
 
-    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesCurrentPlayer(List<net.rmelick.hanabi.backend.Tile> internalTiles) {
+    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesFullInfo(List<Tile> internalTiles) {
+      List<net.rmelick.hanabi.backend.api.Tile> externalTiles = new ArrayList<>(internalTiles.size());
+      for (Tile internalTile : internalTiles) {
+        net.rmelick.hanabi.backend.api.Tile externalTile = new net.rmelick.hanabi.backend.api.Tile();
+        externalTile.color = internalTile.getColor().getPrettyName();
+        externalTile.id = internalTile.getId();
+        externalTile.publicId = internalTile.getPublicId();
+        externalTile.rank = internalTile.getRank().getValue();
+        externalTiles.add(externalTile);
+      }
+      return externalTiles;
+    }
+
+    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesInHandCurrentPlayer(List<TileInHand> internalTiles) {
         List<net.rmelick.hanabi.backend.api.Tile> externalTiles = new ArrayList<>(internalTiles.size());
-        for (net.rmelick.hanabi.backend.Tile internalTile : internalTiles) {
+        for (TileInHand tileInHand : internalTiles) {
             net.rmelick.hanabi.backend.api.Tile externalTile = new net.rmelick.hanabi.backend.api.Tile();
-            externalTile.publicId = internalTile.getPublicId();
+            externalTile.publicId = tileInHand.getTile().getPublicId();
+            externalTile.hintInformation = convertInternalHints(tileInHand);
             externalTiles.add(externalTile);
         }
         return externalTiles;
+    }
+
+    private static HintInformation convertInternalHints(TileInHand tileInHand) {
+      HintInformation hintInformation = new HintInformation();
+      hintInformation.positiveHintsGiven = convertInternalHints(tileInHand.getMatchingHints());
+      hintInformation.negativeHintsGiven = convertInternalHints(tileInHand.getNonMatchingHints());
+      return hintInformation;
+    }
+
+    private static List<HintMove> convertInternalHints(List<Hint> internalHints) {
+      List<HintMove> externalHints = new ArrayList<>(internalHints.size());
+      for (Hint internalHint: internalHints) {
+        HintMove externalHint = new HintMove();
+        switch (internalHint.getHintType()) {
+        case COLOR:
+          externalHint.color = internalHint.getColorHint().getPrettyName();
+          break;
+        case RANK:
+          externalHint.rank = internalHint.getRankHint().getValue();
+          break;
+        }
+        externalHints.add(externalHint);
+      }
+      return externalHints;
     }
 
     private static AvailableMoves computeAvailableMoves(String playerId, FullGameState internalGameState) {
@@ -122,7 +163,7 @@ public class InternalToExternalAdapter {
 
       // discards and plays are always available for all of your tiles
       AvailableMoves availableMoves = new AvailableMoves();
-      List<Tile> playerTiles = internalGameState.getPlayer(playerId).getTiles();
+      List<TileInHand> playerTiles = internalGameState.getPlayer(playerId).getTilesInHand();
       availableMoves.discards = new ArrayList<>(playerTiles.size());
       availableMoves.plays = new ArrayList<>(playerTiles.size());
       for (int tileIndex = 0; tileIndex < playerTiles.size(); tileIndex++) {
@@ -154,11 +195,11 @@ public class InternalToExternalAdapter {
     }
 
     private static HintsForPlayer computeAvailableHints(PlayerState playerState) {
-      Set<String> availableColors = playerState.getTiles().stream()
-          .map(tile -> tile.getColor().getPrettyName())
+      Set<String> availableColors = playerState.getTilesInHand().stream()
+          .map(tile -> tile.getTile().getColor().getPrettyName())
           .collect(Collectors.toSet());
-      Set<Integer> availableRanks = playerState.getTiles().stream()
-          .map(tile -> tile.getRank().getValue())
+      Set<Integer> availableRanks = playerState.getTilesInHand().stream()
+          .map(tile -> tile.getTile().getRank().getValue())
           .collect(Collectors.toSet());
       HintsForPlayer hints = new HintsForPlayer();
       hints.colorHints = new ArrayList<>(availableColors);

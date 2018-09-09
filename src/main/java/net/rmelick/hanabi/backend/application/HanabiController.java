@@ -53,18 +53,18 @@ public class HanabiController {
   }
 
   @RequestMapping(value = "/games/{gameId}/move/play", method = RequestMethod.POST)
-  public void makeMove(@PathVariable String gameId, @RequestBody PlayMove move) {
-
+  public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody PlayMove playMove) {
+    _gameManager.getGame(gameId).play(playerId, playMove.position);
   }
 
   @RequestMapping(value = "/games/{gameId}/move/discard", method = RequestMethod.POST)
-  public void makeMove(@PathVariable String gameId, @RequestBody DiscardMove move) {
-
+  public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody DiscardMove discardMove) {
+    _gameManager.getGame(gameId).discard(playerId, discardMove.position);
   }
 
   @RequestMapping(value = "/games/{gameId}/move/hint", method = RequestMethod.POST)
-  public void makeMove(@PathVariable String gameId, @RequestBody HintMove move) {
-
+  public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody HintMove hintMove) {
+    _gameManager.getGame(gameId).hint(playerId, hintMove.playerId, ExternalToInternalAdapter.convertHintMove(hintMove));
   }
 
 }
