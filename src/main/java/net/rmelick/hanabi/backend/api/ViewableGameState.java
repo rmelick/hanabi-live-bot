@@ -2,8 +2,6 @@ package net.rmelick.hanabi.backend.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 /**
  *
  */
@@ -20,4 +18,6 @@ public class ViewableGameState {
   public int cluesRemaining;
   @JsonProperty("mistakes_remaining")
   public int mistakesRemaining;
+  @JsonProperty("available_moves")
+  public AvailableMoves availableMoves;
 }

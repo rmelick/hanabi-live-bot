@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InternalToExternalAdapter {
@@ -28,10 +29,11 @@ public class InternalToExternalAdapter {
         externalGameState.board = convertInternalBoard(internalGameState.getBoardState());
         externalGameState.cluesRemaining = (int) internalGameState.getCluesRemaining().get();
         externalGameState.mistakesRemaining = (int) internalGameState.getMistakesRemaining().get();
+        externalGameState.availableMoves = computeAvailableMoves(playerId, internalGameState);
         return externalGameState;
     }
 
-    private static Board convertInternalBoard(BoardState internalBoardState) {
+  private static Board convertInternalBoard(BoardState internalBoardState) {
         Board externalBoard = new Board();
         externalBoard.playedTiles = new HashMap<>();
         for (Map.Entry<Color, List<Tile>> entry : internalBoardState.getPlayedTiles().entrySet()) {
@@ -112,4 +114,56 @@ public class InternalToExternalAdapter {
         }
         return externalTiles;
     }
+
+    private static AvailableMoves computeAvailableMoves(String playerId, FullGameState internalGameState) {
+      if (!playerId.equals(internalGameState.getCurrentPlayerState().getId())) {
+        return emptyAvailableMoves();
+      }
+
+      // discards and plays are always available for all of your tiles
+      AvailableMoves availableMoves = new AvailableMoves();
+      List<Tile> playerTiles = internalGameState.getPlayer(playerId).getTiles();
+      availableMoves.discards = new ArrayList<>(playerTiles.size());
+      availableMoves.plays = new ArrayList<>(playerTiles.size());
+      for (int tileIndex = 0; tileIndex < playerTiles.size(); tileIndex++) {
+        DiscardMove dm = new DiscardMove();
+        dm.position = tileIndex;
+        availableMoves.discards.add(dm);
+        PlayMove pm = new PlayMove();
+        pm.position = tileIndex;
+        availableMoves.plays.add(pm);
+      }
+
+      // hints available depend on the other players hand (you can't hint something that isn't there)
+      availableMoves.hints = new HashMap<>();
+      for (PlayerState playerState : internalGameState.getPlayerStates()) {
+        if (!playerState.getId().equals(playerId)) {
+          availableMoves.hints.put(playerState.getId(), computeAvailableHints(playerState));
+        }
+      }
+
+      return availableMoves;
+    }
+
+    private static AvailableMoves emptyAvailableMoves() {
+      AvailableMoves availableMoves = new AvailableMoves();
+      availableMoves.discards = Collections.emptyList();
+      availableMoves.plays = Collections.emptyList();
+      availableMoves.hints = Collections.emptyMap();
+      return availableMoves;
+    }
+
+    private static HintsForPlayer computeAvailableHints(PlayerState playerState) {
+      Set<String> availableColors = playerState.getTiles().stream()
+          .map(tile -> tile.getColor().getPrettyName())
+          .collect(Collectors.toSet());
+      Set<Integer> availableRanks = playerState.getTiles().stream()
+          .map(tile -> tile.getRank().getValue())
+          .collect(Collectors.toSet());
+      HintsForPlayer hints = new HintsForPlayer();
+      hints.colorHints = new ArrayList<>(availableColors);
+      hints.rankHints = new ArrayList<>(availableRanks);
+      return hints;
+    }
+
 }
