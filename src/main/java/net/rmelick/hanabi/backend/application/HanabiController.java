@@ -35,34 +35,11 @@ public class HanabiController {
     return response;
   }
 
-  @RequestMapping(value = "/gameState/{gameId}", method = RequestMethod.GET)
+  @RequestMapping(value = "/games/{gameId}/state", method = RequestMethod.GET)
   public ViewableGameState getGameState(@PathVariable String gameId) throws JsonProcessingException {
     FullGameState fullGameState = _gameManager.getGame(gameId);
     String currentPlayer = fullGameState.getCurrentPlayerState().getId();
     return InternalToExternalAdapter.convertInternalGameState(fullGameState, currentPlayer);
   }
 
-  private FullGameState newRandomGameState() {
-    String gameId = _gameManager.createGame(4);
-    FullGameState gameState = _gameManager.getGame(gameId);
-    boolean played = false;
-    for (PlayerState player : gameState.getPlayerStates()) {
-      int tilePosition = 0;
-      for (net.rmelick.hanabi.backend.Tile tile : player.getTiles()) {
-        if (Rank.ONE.equals(tile.getRank())) {
-          gameState.unsafePlayOffTurn(player.getId(), tilePosition);
-          played = true;
-          break;
-        }
-        tilePosition++;
-      }
-      if (played) {
-        break;
-      }
-    }
-    for (PlayerState player : gameState.getPlayerStates()) {
-      gameState.discard(player.getId(), 0);
-    }
-    return gameState;
-  }
 }
