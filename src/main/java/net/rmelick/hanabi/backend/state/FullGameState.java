@@ -1,6 +1,7 @@
 package net.rmelick.hanabi.backend.state;
 
 import net.rmelick.hanabi.backend.Hint;
+import net.rmelick.hanabi.backend.PlayerInfo;
 import net.rmelick.hanabi.backend.Tile;
 
 import java.util.ArrayList;
@@ -19,12 +20,15 @@ public class FullGameState {
   private final DrawPileState _drawPileState = new DrawPileState();
   private final DiscardPileState _discardPileState = new DiscardPileState();
   private final BoardState _boardState = new BoardState();
-  private final String _gameId = UUID.randomUUID().toString();
+  private final String _gameId;
   private final int _numPlayers;
   private int _currentPlayerIndex;
   private PlayerState _currentPlayer;
 
-  public FullGameState(int numPlayers) {
+  public FullGameState(String gameId, List<PlayerInfo> players) {
+    _gameId = gameId;
+
+    int numPlayers = players.size();
     if (numPlayers < 2) {
       throw new IllegalArgumentException("not enough players");
     } else if (numPlayers > 5) {
@@ -33,7 +37,8 @@ public class FullGameState {
     _numPlayers = numPlayers;
 
     for(int playerIndex = 0; playerIndex < _numPlayers; playerIndex++) {
-      _playerStates.add(new PlayerState(playerIndex));
+      PlayerInfo player = players.get(playerIndex);
+      _playerStates.add(new PlayerState(player.getId(), player.getName(), playerIndex));
     }
     _currentPlayerIndex = 0;
     _currentPlayer = _playerStates.get(_currentPlayerIndex);

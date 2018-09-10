@@ -3,7 +3,18 @@ package net.rmelick.hanabi.backend.application;
 import net.rmelick.hanabi.backend.Color;
 import net.rmelick.hanabi.backend.Hint;
 import net.rmelick.hanabi.backend.Tile;
-import net.rmelick.hanabi.backend.api.*;
+import net.rmelick.hanabi.backend.api.game.AvailableMoves;
+import net.rmelick.hanabi.backend.api.game.Board;
+import net.rmelick.hanabi.backend.api.game.DiscardMove;
+import net.rmelick.hanabi.backend.api.game.DiscardPile;
+import net.rmelick.hanabi.backend.api.game.DrawPile;
+import net.rmelick.hanabi.backend.api.game.HintInformation;
+import net.rmelick.hanabi.backend.api.game.HintMove;
+import net.rmelick.hanabi.backend.api.game.HintsForPlayer;
+import net.rmelick.hanabi.backend.api.game.PlayMove;
+import net.rmelick.hanabi.backend.api.game.Player;
+import net.rmelick.hanabi.backend.api.game.Players;
+import net.rmelick.hanabi.backend.api.game.ViewableGameState;
 import net.rmelick.hanabi.backend.state.*;
 
 import java.util.ArrayList;
@@ -93,11 +104,11 @@ public class InternalToExternalAdapter {
         return externalPlayers;
     }
 
-    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesInHandFullInfo(List<TileInHand> internalTiles) {
-        List<net.rmelick.hanabi.backend.api.Tile> externalTiles = new ArrayList<>(internalTiles.size());
+    private static List<net.rmelick.hanabi.backend.api.game.Tile> convertInternalTilesInHandFullInfo(List<TileInHand> internalTiles) {
+        List<net.rmelick.hanabi.backend.api.game.Tile> externalTiles = new ArrayList<>(internalTiles.size());
         for (TileInHand tileInHand : internalTiles) {
             Tile internalTile = tileInHand.getTile();
-            net.rmelick.hanabi.backend.api.Tile externalTile = new net.rmelick.hanabi.backend.api.Tile();
+            net.rmelick.hanabi.backend.api.game.Tile externalTile = new net.rmelick.hanabi.backend.api.game.Tile();
             externalTile.color = internalTile.getColor().getPrettyName();
             externalTile.id = internalTile.getId();
             externalTile.publicId = internalTile.getPublicId();
@@ -108,10 +119,10 @@ public class InternalToExternalAdapter {
         return externalTiles;
     }
 
-    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesFullInfo(List<Tile> internalTiles) {
-      List<net.rmelick.hanabi.backend.api.Tile> externalTiles = new ArrayList<>(internalTiles.size());
+    private static List<net.rmelick.hanabi.backend.api.game.Tile> convertInternalTilesFullInfo(List<Tile> internalTiles) {
+      List<net.rmelick.hanabi.backend.api.game.Tile> externalTiles = new ArrayList<>(internalTiles.size());
       for (Tile internalTile : internalTiles) {
-        net.rmelick.hanabi.backend.api.Tile externalTile = new net.rmelick.hanabi.backend.api.Tile();
+        net.rmelick.hanabi.backend.api.game.Tile externalTile = new net.rmelick.hanabi.backend.api.game.Tile();
         externalTile.color = internalTile.getColor().getPrettyName();
         externalTile.id = internalTile.getId();
         externalTile.publicId = internalTile.getPublicId();
@@ -121,10 +132,10 @@ public class InternalToExternalAdapter {
       return externalTiles;
     }
 
-    private static List<net.rmelick.hanabi.backend.api.Tile> convertInternalTilesInHandCurrentPlayer(List<TileInHand> internalTiles) {
-        List<net.rmelick.hanabi.backend.api.Tile> externalTiles = new ArrayList<>(internalTiles.size());
+    private static List<net.rmelick.hanabi.backend.api.game.Tile> convertInternalTilesInHandCurrentPlayer(List<TileInHand> internalTiles) {
+        List<net.rmelick.hanabi.backend.api.game.Tile> externalTiles = new ArrayList<>(internalTiles.size());
         for (TileInHand tileInHand : internalTiles) {
-            net.rmelick.hanabi.backend.api.Tile externalTile = new net.rmelick.hanabi.backend.api.Tile();
+            net.rmelick.hanabi.backend.api.game.Tile externalTile = new net.rmelick.hanabi.backend.api.game.Tile();
             externalTile.publicId = tileInHand.getTile().getPublicId();
             externalTile.hintInformation = convertInternalHints(tileInHand);
             externalTiles.add(externalTile);

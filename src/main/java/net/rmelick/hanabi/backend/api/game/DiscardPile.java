@@ -1,4 +1,4 @@
-package net.rmelick.hanabi.backend.api;
+package net.rmelick.hanabi.backend.api.game;
 
 import java.util.List;
 
