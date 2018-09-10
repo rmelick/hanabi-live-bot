@@ -41,6 +41,10 @@ public class GameManager {
         return _completedGames;
     }
 
+    public GameWaitingToBegin getGameWaitingToBegin(String gameId) {
+        return _gamesWaitingToBegin.get(gameId);
+    }
+
     public FullGameState getInProgressGame(String gameId) {
         return _inProgressGames.get(gameId);
     }

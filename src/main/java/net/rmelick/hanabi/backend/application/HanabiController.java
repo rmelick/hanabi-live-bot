@@ -2,6 +2,7 @@ package net.rmelick.hanabi.backend.application;
 
 import net.rmelick.hanabi.backend.GameManager;
 import net.rmelick.hanabi.backend.GameWaitingToBegin;
+import net.rmelick.hanabi.backend.PlayerInfo;
 import net.rmelick.hanabi.backend.api.game.DiscardMove;
 import net.rmelick.hanabi.backend.api.game.HintMove;
 import net.rmelick.hanabi.backend.api.game.PlayMove;
@@ -34,7 +35,7 @@ public class HanabiController {
   private final GameManager _gameManager = new GameManager();
 
   @RequestMapping(value = "/newGame", method = RequestMethod.POST)
-  public void newGame(@RequestParam int numPlayers) {
+  public void newGame() {
     _gameManager.createGame();
   }
 
@@ -74,12 +75,10 @@ public class HanabiController {
   }
 
   @RequestMapping(value = "/games/{gameId}/join", method = RequestMethod.POST)
-  public Map<String, String> joinGame(@PathVariable String gameId) {
-    FullGameState fullGameState = _gameManager.getInProgressGame(gameId);
-    String playerId = fullGameState.getCurrentPlayerState().getId();
-    Map<String, String> response = new HashMap<>();
-    response.put("player_id", playerId);
-    return response;
+  public void joinGame(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestParam String playerName) {
+    GameWaitingToBegin gameWaitingToBegin = _gameManager.getGameWaitingToBegin(gameId);
+    PlayerInfo playerInfo = new PlayerInfo(playerName, playerId);
+    gameWaitingToBegin.addPlayer(playerInfo);
   }
 
   @RequestMapping(value = "/games/{gameId}/state", method = RequestMethod.GET)
