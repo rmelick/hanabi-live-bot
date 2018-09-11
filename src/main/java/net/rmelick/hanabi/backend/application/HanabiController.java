@@ -80,6 +80,11 @@ public class HanabiController {
     return InternalToExternalAdapter.convertInternalGameState(fullGameState, playerId);
   }
 
+  @RequestMapping(value = "/games/{gameId}/start", method = RequestMethod.POST)
+  public void startGame(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId) {
+    _gameManager.startGame(gameId);
+  }
+
   @RequestMapping(value = "/games/{gameId}/move/play", method = RequestMethod.POST)
   public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody PlayMove playMove) {
     _gameManager.getInProgressGame(gameId).play(playerId, playMove.position);
