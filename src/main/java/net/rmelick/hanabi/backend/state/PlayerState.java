@@ -1,5 +1,6 @@
 package net.rmelick.hanabi.backend.state;
 
+import net.rmelick.hanabi.backend.PlayerType;
 import net.rmelick.hanabi.backend.Tile;
 
 import java.util.ArrayList;
@@ -11,14 +12,28 @@ import java.util.List;
 public class PlayerState {
   private final String _id;
   private final String _name;
+  private final PlayerType _type;
   private final int _playerIndex;
   private final List<TileInHand> _tiles;
 
-  public PlayerState(String playerId, String playerName, int playerIndex) {
+  public PlayerState(String playerId, String playerName, PlayerType type, int playerIndex) {
     _name = playerName;
     _playerIndex = playerIndex;
+    _type = type;
     _tiles = new ArrayList<>();
     _id = playerId;
+  }
+
+  public String getId() {
+    return _id;
+  }
+
+  public String getName() {
+    return _name;
+  }
+
+  public PlayerType getType() {
+    return _type;
   }
 
   /**
@@ -33,16 +48,8 @@ public class PlayerState {
     return _tiles.remove(tilePosition).getTile();
   }
 
-  public String getName() {
-    return _name;
-  }
-
   public int getPlayerIndex() {
     return _playerIndex;
-  }
-
-  public String getId() {
-    return _id;
   }
 
   public List<TileInHand> getTilesInHand() {

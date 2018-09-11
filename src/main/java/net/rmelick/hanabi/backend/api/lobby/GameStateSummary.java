@@ -2,6 +2,8 @@ package net.rmelick.hanabi.backend.api.lobby;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 /**
  *
  */
@@ -11,4 +13,5 @@ public class GameStateSummary {
   public GameStatus status;
   @JsonProperty("num_players")
   public int numPlayers;
+  public List<PlayerInfo> players;
 }

@@ -19,6 +19,7 @@ import net.rmelick.hanabi.backend.api.game.Players;
 import net.rmelick.hanabi.backend.api.game.ViewableGameState;
 import net.rmelick.hanabi.backend.api.lobby.GameStateSummary;
 import net.rmelick.hanabi.backend.api.lobby.GameStatus;
+import net.rmelick.hanabi.backend.api.lobby.PlayerInfo;
 import net.rmelick.hanabi.backend.state.*;
 
 import java.util.ArrayList;
@@ -223,6 +224,7 @@ class InternalToExternalAdapter {
     summary.gameId = gameWaitingToBegin.getGameId();
     summary.status = GameStatus.WAITING_TO_BEGIN;
     summary.numPlayers = gameWaitingToBegin.getPlayers().size();
+    summary.players = convertPlayerInfos(gameWaitingToBegin.getPlayers());
     return summary;
   }
 
@@ -231,6 +233,7 @@ class InternalToExternalAdapter {
     summary.gameId = game.getGameId();
     summary.status = GameStatus.IN_PROGRESS;
     summary.numPlayers = game.getPlayerStates().size();
+    summary.players = convertPlayerStates(game.getPlayerStates());
     return summary;
   }
 
@@ -239,6 +242,27 @@ class InternalToExternalAdapter {
     summary.gameId = game.getGameState().getGameId();
     summary.status = GameStatus.COMPLETED;
     summary.numPlayers = game.getGameState().getPlayerStates().size();
+    summary.players = convertPlayerStates(game.getGameState().getPlayerStates());
     return summary;
+  }
+
+  private static List<PlayerInfo> convertPlayerInfos(List<net.rmelick.hanabi.backend.PlayerInfo> internalPlayerInfos) {
+      return internalPlayerInfos.stream().map(internalPlayer -> {
+        PlayerInfo externalPlayer = new PlayerInfo();
+        externalPlayer.id = internalPlayer.getId();
+        externalPlayer.name = internalPlayer.getName();
+        externalPlayer.type = internalPlayer.getType().toString();
+        return externalPlayer;
+      }).collect(Collectors.toList());
+  }
+
+  private static List<PlayerInfo> convertPlayerStates(List<PlayerState> internalPlayerStates) {
+    return internalPlayerStates.stream().map(internalPlayer -> {
+      PlayerInfo externalPlayer = new PlayerInfo();
+      externalPlayer.id = internalPlayer.getId();
+      externalPlayer.name = internalPlayer.getName();
+      externalPlayer.type = internalPlayer.getType().toString();
+      return externalPlayer;
+    }).collect(Collectors.toList());
   }
 }

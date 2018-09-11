@@ -38,7 +38,8 @@ public class FullGameState {
 
     for(int playerIndex = 0; playerIndex < _numPlayers; playerIndex++) {
       PlayerInfo player = players.get(playerIndex);
-      _playerStates.add(new PlayerState(player.getId(), player.getName(), playerIndex));
+      _playerStates.add(new PlayerState(player.getId(),
+          player.getName(), player.getType(), playerIndex));
     }
     _currentPlayerIndex = 0;
     _currentPlayer = _playerStates.get(_currentPlayerIndex);
