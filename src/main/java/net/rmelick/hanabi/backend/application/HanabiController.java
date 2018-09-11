@@ -8,7 +8,6 @@ import net.rmelick.hanabi.backend.api.game.HintMove;
 import net.rmelick.hanabi.backend.api.game.PlayMove;
 import net.rmelick.hanabi.backend.api.game.ViewableGameState;
 import net.rmelick.hanabi.backend.api.lobby.GameStateSummary;
-import net.rmelick.hanabi.backend.api.lobby.GameStatus;
 import net.rmelick.hanabi.backend.state.FullGameState;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -43,35 +40,30 @@ public class HanabiController {
   public List<GameStateSummary> getAllGames() {
     List<GameStateSummary> allGames = new ArrayList<>();
     allGames.addAll(_gameManager.getGamesWaitingToBegin().values().
-        stream().map(gameWaitingToBegin -> {
-          GameStateSummary summary = new GameStateSummary();
-          summary.gameId = gameWaitingToBegin.getGameId();
-          summary.status = GameStatus.WAITING_TO_BEGIN;
-          summary.numPlayers = gameWaitingToBegin.getPlayers().size();
-          return summary;
-        })
+        stream().map(InternalToExternalAdapter::getGameStateSummary)
         .collect(Collectors.toList()));
 
     allGames.addAll(_gameManager.getInProgressGames().values().
-        stream().map(game -> {
-      GameStateSummary summary = new GameStateSummary();
-      summary.gameId = game.getGameId();
-      summary.status = GameStatus.IN_PROGRESS;
-      summary.numPlayers = game.getPlayerStates().size();
-      return summary;
-    })
+        stream().map(InternalToExternalAdapter::getGameStateSummary)
         .collect(Collectors.toList()));
 
     allGames.addAll(_gameManager.getCompletedGames().values().
-        stream().map(game -> {
-      GameStateSummary summary = new GameStateSummary();
-      summary.gameId = game.getGameState().getGameId();
-      summary.status = GameStatus.COMPLETED;
-      summary.numPlayers = game.getGameState().getPlayerStates().size();
-      return summary;
-    })
+        stream().map(InternalToExternalAdapter::getGameStateSummary)
         .collect(Collectors.toList()));
     return allGames;
+  }
+
+  @RequestMapping(value = "/games/{gameId}/summary", method = RequestMethod.GET)
+  public GameStateSummary getGameStateSummary(@PathVariable String gameId) {
+    if (_gameManager.getGameWaitingToBegin(gameId) != null) {
+      return InternalToExternalAdapter.getGameStateSummary(_gameManager.getGameWaitingToBegin(gameId));
+    } else if (_gameManager.getInProgressGame(gameId) != null) {
+      return InternalToExternalAdapter.getGameStateSummary(_gameManager.getInProgressGame(gameId));
+    } else if (_gameManager.getCompletedGame(gameId) != null) {
+      return InternalToExternalAdapter.getGameStateSummary(_gameManager.getCompletedGame(gameId));
+    } else {
+      return null;
+    }
   }
 
   @RequestMapping(value = "/games/{gameId}/join", method = RequestMethod.POST)

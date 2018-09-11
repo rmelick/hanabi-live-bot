@@ -49,5 +49,9 @@ public class GameManager {
         return _inProgressGames.get(gameId);
     }
 
+    public CompletedGame getCompletedGame(String gameId) {
+        return _completedGames.get(gameId);
+    }
+
 
 }

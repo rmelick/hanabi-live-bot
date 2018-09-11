@@ -1,6 +1,8 @@
 package net.rmelick.hanabi.backend.application;
 
 import net.rmelick.hanabi.backend.Color;
+import net.rmelick.hanabi.backend.CompletedGame;
+import net.rmelick.hanabi.backend.GameWaitingToBegin;
 import net.rmelick.hanabi.backend.Hint;
 import net.rmelick.hanabi.backend.Tile;
 import net.rmelick.hanabi.backend.api.game.AvailableMoves;
@@ -15,6 +17,8 @@ import net.rmelick.hanabi.backend.api.game.PlayMove;
 import net.rmelick.hanabi.backend.api.game.Player;
 import net.rmelick.hanabi.backend.api.game.Players;
 import net.rmelick.hanabi.backend.api.game.ViewableGameState;
+import net.rmelick.hanabi.backend.api.lobby.GameStateSummary;
+import net.rmelick.hanabi.backend.api.lobby.GameStatus;
 import net.rmelick.hanabi.backend.state.*;
 
 import java.util.ArrayList;
@@ -25,14 +29,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class InternalToExternalAdapter {
+class InternalToExternalAdapter {
     /**
      * Convert the full internal game state to a subset of the state viewable by the user
      * @param internalGameState full state
      * @param playerId user viewing the state
      * @return
      */
-    public static ViewableGameState convertInternalGameState(FullGameState internalGameState, String playerId) {
+    static ViewableGameState convertInternalGameState(FullGameState internalGameState, String playerId) {
         ViewableGameState externalGameState = new ViewableGameState();
         externalGameState.gameId = internalGameState.getGameId();
         externalGameState.players = convertInternalPlayers(internalGameState, playerId);
@@ -214,4 +218,27 @@ public class InternalToExternalAdapter {
       return hints;
     }
 
+  static GameStateSummary getGameStateSummary(GameWaitingToBegin gameWaitingToBegin) {
+    GameStateSummary summary = new GameStateSummary();
+    summary.gameId = gameWaitingToBegin.getGameId();
+    summary.status = GameStatus.WAITING_TO_BEGIN;
+    summary.numPlayers = gameWaitingToBegin.getPlayers().size();
+    return summary;
+  }
+
+  static GameStateSummary getGameStateSummary(FullGameState game) {
+    GameStateSummary summary = new GameStateSummary();
+    summary.gameId = game.getGameId();
+    summary.status = GameStatus.IN_PROGRESS;
+    summary.numPlayers = game.getPlayerStates().size();
+    return summary;
+  }
+
+  static GameStateSummary getGameStateSummary(CompletedGame game) {
+    GameStateSummary summary = new GameStateSummary();
+    summary.gameId = game.getGameState().getGameId();
+    summary.status = GameStatus.COMPLETED;
+    summary.numPlayers = game.getGameState().getPlayerStates().size();
+    return summary;
+  }
 }
