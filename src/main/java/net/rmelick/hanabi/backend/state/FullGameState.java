@@ -113,6 +113,7 @@ public class FullGameState {
     boolean successfullyPlayed = _boardState.play(tileToPlay);
     if (!successfullyPlayed) {
       _mistakesRemaining.decrementAndGet();
+      _discardPileState.discard(tileToPlay);
     }
     unsafeDrawOffTurn(playerId);
   }
@@ -121,6 +122,7 @@ public class FullGameState {
     checkIsTurn(playerId);
     checkCluesAvailable();
     applyHint(hint, getPlayer(recipientPlayerId));
+    _cluesRemaining.decrementAndGet();
     advanceTurn();
   }
 
