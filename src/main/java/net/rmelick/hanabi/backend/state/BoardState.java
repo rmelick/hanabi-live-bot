@@ -24,11 +24,9 @@ public class BoardState {
 
   public boolean play(Tile tile) {
     if (alreadyPlayed(tile)) {
-      System.out.println(tile + " has already been played");
       return false;
     }
     else if (!isNextInColor(tile)) {
-      System.out.println(tile + " is not the next tile in its color");
       return false;
     } else {
       _playedTiles.get(tile.getColor()).add(tile);
@@ -69,5 +67,9 @@ public class BoardState {
 
   public Map<Color, List<Tile>> getPlayedTiles() {
     return _playedTiles;
+  }
+
+  public int getCurrentPoints() {
+    return _playedTiles.values().stream().mapToInt(List::size).sum();
   }
 }

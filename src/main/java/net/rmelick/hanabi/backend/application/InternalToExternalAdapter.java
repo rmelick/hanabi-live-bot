@@ -56,6 +56,7 @@ class InternalToExternalAdapter {
         for (Map.Entry<Color, List<Tile>> entry : internalBoardState.getPlayedTiles().entrySet()) {
             externalBoard.playedTiles.put(entry.getKey().getPrettyName(), convertInternalTilesFullInfo(entry.getValue()));
         }
+        externalBoard.scoredPoints = internalBoardState.getCurrentPoints();
         return externalBoard;
     }
 

@@ -26,7 +26,7 @@ public class ClientNotifier {
   public void notifyGameStateSummaryChange(String gameId) {
     logger.info("notifying game state change for " + gameId);
     Map<String, String> message = new HashMap<>();
-    message.put("messageType", "GAME_STATE_CHANGED");
+    message.put("messageType", "GAME_STATE_SUMMARY_CHANGED");
     message.put("game_id", gameId);
     _outgoingSocketMessages.convertAndSend("/topic/all", message);
     _outgoingSocketMessages.convertAndSend("/topic/gamestatesummary/" + gameId, message);
