@@ -47,6 +47,7 @@ class InternalToExternalAdapter {
         externalGameState.cluesRemaining = (int) internalGameState.getCluesRemaining().get();
         externalGameState.mistakesRemaining = (int) internalGameState.getMistakesRemaining().get();
         externalGameState.availableMoves = computeAvailableMoves(playerId, internalGameState);
+        externalGameState.isCompleted = internalGameState.isGameIsCompleted();
         return externalGameState;
     }
 

@@ -6,7 +6,6 @@ import net.rmelick.hanabi.backend.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -24,9 +23,13 @@ public class FullGameState {
   private final int _numPlayers;
   private int _currentPlayerIndex;
   private PlayerState _currentPlayer;
+  private boolean _gameIsCompleted;
+  private String _playerToDrawLastTile;
 
   public FullGameState(String gameId, List<PlayerInfo> players) {
     _gameId = gameId;
+    _gameIsCompleted = false;
+    _playerToDrawLastTile = null;
 
     int numPlayers = players.size();
     if (numPlayers < 2) {
@@ -65,21 +68,18 @@ public class FullGameState {
     throw new IllegalArgumentException("Could not find player " + playerId);
   }
 
-  private void checkIsTurn(String playerId) {
+  private void checkBeginningOfTurn(String playerId) {
+    if (_gameIsCompleted) {
+      throw new IllegalStateException("Game is completed");
+    }
     if (!_currentPlayer.getId().equals(playerId)) {
       throw new IllegalStateException("Not the players turn: " + playerId);
     }
   }
 
-  private void draw(String playerId) {
-    checkIsTurn(playerId);
-    unsafeDraw(playerId);
-  }
-
   // do not check if it is allowed
   private void unsafeDraw(String playerId) {
     unsafeDrawOffTurn(playerId);
-    advanceTurn();
   }
 
   // internal draw for specific player that does not advance the turn
@@ -88,9 +88,13 @@ public class FullGameState {
     getPlayer(playerId).receiveTile(nextTile);
   }
 
+  /**
+   *
+   */
   public void discard(String playerId, int positionToDiscard) {
-    checkIsTurn(playerId);
+    checkBeginningOfTurn(playerId);
     unsafeDiscard(playerId, positionToDiscard);
+    endTurn(playerId);
   }
 
   private void unsafeDiscard(String playerId, int positionToDiscard) {
@@ -99,13 +103,16 @@ public class FullGameState {
     if (_cluesRemaining.get() < MAX_CLUES) {
       _cluesRemaining.incrementAndGet();
     }
-    draw(playerId);
+    unsafeDraw(playerId);
   }
 
+  /**
+   *
+   */
   public void play(String playerId, int positionToPlay) {
-    checkIsTurn(playerId);
+    checkBeginningOfTurn(playerId);
     unsafePlayOffTurn(playerId, positionToPlay);
-    advanceTurn();
+    endTurn(playerId);
   }
 
   private void unsafePlayOffTurn(String playerId, int positionToPlay) {
@@ -118,12 +125,15 @@ public class FullGameState {
     unsafeDrawOffTurn(playerId);
   }
 
+  /**
+   *
+   */
   public void hint(String playerId, String recipientPlayerId, Hint hint) {
-    checkIsTurn(playerId);
+    checkBeginningOfTurn(playerId);
     checkCluesAvailable();
     applyHint(hint, getPlayer(recipientPlayerId));
     _cluesRemaining.decrementAndGet();
-    advanceTurn();
+    endTurn(playerId);
   }
 
   private void checkCluesAvailable() {
@@ -145,13 +155,28 @@ public class FullGameState {
     }
   }
 
-  private void advanceTurn() {
+  private void endTurn(String playerId) {
     _currentPlayerIndex += 1;
     if (_currentPlayerIndex >= _numPlayers) {
       _currentPlayerIndex = 0;
     }
     _currentPlayer = _playerStates.get(_currentPlayerIndex);
-    // TODO notify outwards that the turn is over?
+    checkForGameOver(playerId);
+  }
+
+  private void checkForGameOver(String playerId) {
+    if (_mistakesRemaining.get() <= 0) {
+      _gameIsCompleted = true;
+    }
+    if (_drawPileState.tilesRemaining() == 0) {
+      if (_playerToDrawLastTile == null) {
+        // track who drew the last tile
+        _playerToDrawLastTile = playerId;
+      } else if (_playerToDrawLastTile.equals(playerId)) {
+        // end the game after they take another turn
+        _gameIsCompleted = true;
+      }
+    }
   }
 
   public AtomicLong getCluesRemaining() {
@@ -180,6 +205,10 @@ public class FullGameState {
 
   public BoardState getBoardState() {
     return _boardState;
+  }
+
+  public boolean isGameIsCompleted() {
+    return _gameIsCompleted;
   }
 
   @Override

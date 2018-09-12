@@ -20,4 +20,6 @@ public class ViewableGameState {
   public int mistakesRemaining;
   @JsonProperty("available_moves")
   public AvailableMoves availableMoves;
+  @JsonProperty("is_completed")
+  public boolean isCompleted;
 }
