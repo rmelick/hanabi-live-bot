@@ -10,6 +10,7 @@ import net.rmelick.hanabi.backend.api.game.PlayMove;
 import net.rmelick.hanabi.backend.api.game.ViewableGameState;
 import net.rmelick.hanabi.backend.api.lobby.GameStateSummary;
 import net.rmelick.hanabi.backend.state.FullGameState;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,12 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class HanabiController {
   private final GameManager _gameManager = new GameManager();
+  private final ClientNotifier _clientNotifier;
+
+  @Autowired
+  public HanabiController(ClientNotifier clientNotifier) {
+    _clientNotifier = clientNotifier;
+  }
 
   @RequestMapping(value = "/newGame", method = RequestMethod.POST)
   public void newGame() {
@@ -72,6 +79,7 @@ public class HanabiController {
     GameWaitingToBegin gameWaitingToBegin = _gameManager.getGameWaitingToBegin(gameId);
     PlayerInfo playerInfo = new PlayerInfo(playerName, playerId, PlayerType.HUMAN);
     gameWaitingToBegin.addPlayer(playerInfo);
+    _clientNotifier.notifyGameStateSummaryChange(gameId);
   }
 
   @RequestMapping(value = "/games/{gameId}/state", method = RequestMethod.GET)
@@ -83,21 +91,25 @@ public class HanabiController {
   @RequestMapping(value = "/games/{gameId}/start", method = RequestMethod.POST)
   public void startGame(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId) {
     _gameManager.startGame(gameId);
+    _clientNotifier.notifyGameStateSummaryChange(gameId);
   }
 
   @RequestMapping(value = "/games/{gameId}/move/play", method = RequestMethod.POST)
   public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody PlayMove playMove) {
     _gameManager.getInProgressGame(gameId).play(playerId, playMove.position);
+    _clientNotifier.notifyGameStateChange(gameId);
   }
 
   @RequestMapping(value = "/games/{gameId}/move/discard", method = RequestMethod.POST)
   public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody DiscardMove discardMove) {
     _gameManager.getInProgressGame(gameId).discard(playerId, discardMove.position);
+    _clientNotifier.notifyGameStateChange(gameId);
   }
 
   @RequestMapping(value = "/games/{gameId}/move/hint", method = RequestMethod.POST)
   public void makeMove(@PathVariable String gameId, @RequestHeader("X-Player-Id") String playerId, @RequestBody HintMove hintMove) {
     _gameManager.getInProgressGame(gameId).hint(playerId, hintMove.playerId, ExternalToInternalAdapter.convertHintMove(hintMove));
+    _clientNotifier.notifyGameStateChange(gameId);
   }
 
 }
