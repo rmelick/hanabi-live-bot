@@ -13,7 +13,6 @@ import net.rmelick.hanabi.live.bot.api.game.ViewableGameState;
 import net.rmelick.hanabi.live.bot.api.lobby.GameStateSummary;
 import net.rmelick.hanabi.live.bot.api.lobby.GameStatus;
 import net.rmelick.hanabi.live.bot.api.lobby.PlayerInfo;
-import net.rmelick.hanabi.backend.state.*;
 import net.rmelick.hanabi.live.bot.state.*;
 
 import java.util.ArrayList;
@@ -105,11 +104,11 @@ class InternalToExternalAdapter {
         return externalPlayers;
     }
 
-    private static List<Tile> convertInternalTilesInHandFullInfo(List<TileInHand> internalTiles) {
-        List<Tile> externalTiles = new ArrayList<>(internalTiles.size());
+    private static List<net.rmelick.hanabi.live.bot.api.game.Tile> convertInternalTilesInHandFullInfo(List<TileInHand> internalTiles) {
+        List<net.rmelick.hanabi.live.bot.api.game.Tile> externalTiles = new ArrayList<>(internalTiles.size());
         for (TileInHand tileInHand : internalTiles) {
             Tile internalTile = tileInHand.getTile();
-            Tile externalTile = new Tile();
+            net.rmelick.hanabi.live.bot.api.game.Tile externalTile = new net.rmelick.hanabi.live.bot.api.game.Tile();
             externalTile.color = internalTile.getColor().getPrettyName();
             externalTile.id = internalTile.getId();
             externalTile.publicId = internalTile.getPublicId();
@@ -120,10 +119,10 @@ class InternalToExternalAdapter {
         return externalTiles;
     }
 
-    private static List<Tile> convertInternalTilesFullInfo(List<Tile> internalTiles) {
-      List<Tile> externalTiles = new ArrayList<>(internalTiles.size());
+    private static List<net.rmelick.hanabi.live.bot.api.game.Tile> convertInternalTilesFullInfo(List<Tile> internalTiles) {
+      List<net.rmelick.hanabi.live.bot.api.game.Tile> externalTiles = new ArrayList<>(internalTiles.size());
       for (Tile internalTile : internalTiles) {
-        Tile externalTile = new Tile();
+          net.rmelick.hanabi.live.bot.api.game.Tile externalTile = new net.rmelick.hanabi.live.bot.api.game.Tile();
         externalTile.color = internalTile.getColor().getPrettyName();
         externalTile.id = internalTile.getId();
         externalTile.publicId = internalTile.getPublicId();
@@ -133,10 +132,10 @@ class InternalToExternalAdapter {
       return externalTiles;
     }
 
-    private static List<Tile> convertInternalTilesInHandCurrentPlayer(List<TileInHand> internalTiles) {
-        List<Tile> externalTiles = new ArrayList<>(internalTiles.size());
+    private static List<net.rmelick.hanabi.live.bot.api.game.Tile> convertInternalTilesInHandCurrentPlayer(List<TileInHand> internalTiles) {
+        List<net.rmelick.hanabi.live.bot.api.game.Tile> externalTiles = new ArrayList<>(internalTiles.size());
         for (TileInHand tileInHand : internalTiles) {
-            Tile externalTile = new Tile();
+            net.rmelick.hanabi.live.bot.api.game.Tile externalTile = new net.rmelick.hanabi.live.bot.api.game.Tile();
             externalTile.publicId = tileInHand.getTile().getPublicId();
             externalTile.hintInformation = convertInternalHints(tileInHand);
             externalTiles.add(externalTile);
