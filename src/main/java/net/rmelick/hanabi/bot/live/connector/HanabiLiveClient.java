@@ -1,8 +1,9 @@
 package net.rmelick.hanabi.bot.live.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
-import net.rmelick.hanabi.bot.live.connector.schemas.java.TableListElement;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class HanabiLiveClient {
     private static final String HANABI_LIVE_WEBSOCKET_URL = "wss://hanabi.live/ws";
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
+    private final WorldState _worldState = new WorldState();
     /*
     From public/js/src/modals.ts:63 passwordSubmit
      */
@@ -86,7 +88,7 @@ public class HanabiLiveClient {
             case "hello":
                 return handleHello(_objectMapper.readValue(body, Hello.class));
             case "tableList":
-                return handleTableList(_objectMapper.readValue(body, List.class));
+                return handleTableList(_objectMapper.readValue(body, new TypeReference<List<Table>>() { }));
             default:
                 System.out.println(String.format("Unknown command %s %s", command, body));
                 return false;
@@ -97,7 +99,12 @@ public class HanabiLiveClient {
         return true;
     }
 
-    private boolean handleTableList(List<TableListElement> tableListElement) {
+    private boolean handleTableList(List<Table> tables) {
+        _worldState.updateTables(tables);
         return true;
+    }
+
+    public WorldState getWorldState() {
+        return _worldState;
     }
 }
