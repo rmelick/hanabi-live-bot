@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableGone;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.TableJoin;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
@@ -18,23 +19,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class HanabiLiveClient {
+    private static final Logger LOG = Logger.getLogger(HanabiLiveClient.class.getName());
     private static final String HANABI_LIVE_LOGIN_URL = "https://hanabi.live/login";
     private static final String HANABI_LIVE_WEBSOCKET_URL = "wss://hanabi.live/ws";
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
     private final WorldState _worldState = new WorldState();
-    /*
-    From public/js/src/modals.ts:63 passwordSubmit
-     */
-    private static String hashPassword(String plainTextPassword) {
-        String stringToHash = String.format("Hanabi game password %s", plainTextPassword);
-        return DigestUtils.sha256Hex(stringToHash);
-    }
+    private WebSocket _webSocket = null;
 
     public WebSocket connectWebsocket() throws InterruptedException, IOException {
-        String username = "ryanb";
+        String username = "rolls-bot-test1";
         String password = "iamabot";
         Map<String, Object> data = new HashMap<>();
         data.put("username", username);
@@ -58,9 +55,11 @@ public class HanabiLiveClient {
         client.send(request, HttpResponse.BodyHandlers.ofString());
 
         //now that we have a session cookie, open the websocket
-        return client.newWebSocketBuilder()
+        _webSocket = client.newWebSocketBuilder()
                 .buildAsync(URI.create(HANABI_LIVE_WEBSOCKET_URL), new WebsocketListener(this))
                 .join();
+
+        return _webSocket;
     }
 
     public static HttpRequest.BodyPublisher ofFormData(Map<String, Object> data) {
@@ -85,6 +84,7 @@ public class HanabiLiveClient {
     }
 
     public boolean handleCommand(String command, String body) throws IOException {
+        LOG.info(String.format("Received command %s body %s", command, body));
         switch (command) {
             case "hello":
                 return handleHello(_objectMapper.readValue(body, Hello.class));
@@ -101,7 +101,7 @@ public class HanabiLiveClient {
                 // ignore for now, it's super spammy
                 return false;
             default:
-                System.out.println(String.format("Unknown command %s %s", command, body));
+                LOG.info(String.format("Unknown command %s %s", command, body));
                 return false;
         }
     }
@@ -130,5 +130,22 @@ public class HanabiLiveClient {
 
     public WorldState getWorldState() {
         return _worldState;
+    }
+
+    public void joinTable(Long tableID, String password) {
+        TableJoin command = new TableJoin();
+        command.setTableID(tableID);
+        command.setPassword(hashPassword(password));
+        String socketMessage = CommandParser.serialize("tableJoin", command);
+        LOG.info(String.format("Sending socket message %s", socketMessage));
+        _webSocket.sendText(socketMessage, true);
+    }
+
+    /*
+    From public/js/src/modals.ts:63 passwordSubmit
+     */
+    private static String hashPassword(String plainTextPassword) {
+        String stringToHash = String.format("Hanabi game password %s", plainTextPassword);
+        return DigestUtils.sha256Hex(stringToHash);
     }
 }

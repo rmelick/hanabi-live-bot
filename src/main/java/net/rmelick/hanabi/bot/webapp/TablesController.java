@@ -34,8 +34,9 @@ public class TablesController {
 	}
 
 	@PostMapping(value = "/joinTable")
-	public String join(@RequestParam String tableID, @RequestParam String password, @RequestParam String bot) {
-		System.out.println(String.format("Attempting to join game %s with bot %s password %s", tableID, password, bot));
+	public String join(@RequestParam Long tableID, @RequestParam String password, @RequestParam String bot) {
+		System.out.println(String.format("Attempting to join game %s with bot %s password %s", tableID, bot, password));
+		_client.joinTable(tableID, password);
 		return "redirect:/tables";
 	}
 }
