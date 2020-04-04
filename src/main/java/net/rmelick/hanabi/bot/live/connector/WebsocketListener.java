@@ -3,12 +3,15 @@ package net.rmelick.hanabi.bot.live.connector;
 import java.io.IOException;
 import java.net.http.WebSocket;
 import java.util.concurrent.CompletionStage;
+import java.util.logging.Logger;
 
 class WebsocketListener implements WebSocket.Listener {
-    private final HanabiLiveClient _client;
+    private static final Logger LOG = Logger.getLogger(HanabiGameClient.class.getName());
+
+    private final AbstractHanabiClient _client;
     private StringBuffer _incomingText;
 
-    public WebsocketListener(HanabiLiveClient client) {
+    public WebsocketListener(AbstractHanabiClient client) {
         _client = client;
         _incomingText = new StringBuffer();
     }
@@ -28,9 +31,12 @@ class WebsocketListener implements WebSocket.Listener {
         CommandParser.ParsedCommand command = CommandParser.parseCommand(fullData);
         try {
             if (command != null) {
-                _client.handleCommand(command.command, command.body);
+                boolean success = _client.handleCommand(command.command, command.body);
+                if (!success) {
+                    LOG.warning(String.format("Client %s failed to handle command %s", _client, command.command));
+                }
             } else {
-                System.out.println("Empty command");
+                LOG.warning("Empty command, fullData: " + fullData);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,20 +47,20 @@ class WebsocketListener implements WebSocket.Listener {
 
     @Override
     public void onOpen(WebSocket webSocket) {
-        System.out.println("onOpen");
+        LOG.info("onOpen");
         WebSocket.Listener.super.onOpen(webSocket);
     }
 
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode,
                                       String reason) {
-        System.out.println("onClose: " + statusCode + " " + reason);
+        LOG.info("onClose: " + statusCode + " " + reason);
         return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
     }
 
     @Override
     public void onError(WebSocket webSocket, Throwable error) {
-        System.out.println("onError: " + error);
+        LOG.info("onError: " + error);
         WebSocket.Listener.super.onError(webSocket, error);
     }
 }

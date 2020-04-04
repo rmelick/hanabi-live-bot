@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/Init",
+  "definitions": {
+    "Init": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tableID": {
+          "type": "integer"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variant": {
+          "type": "string"
+        },
+        "seat": {
+          "type": "integer"
+        },
+        "spectating": {
+          "type": "boolean"
+        },
+        "replay": {
+          "type": "boolean"
+        },
+        "sharedReplay": {
+          "type": "boolean"
+        },
+        "databaseID": {
+          "type": "integer"
+        },
+        "timed": {
+          "type": "boolean"
+        },
+        "baseTime": {
+          "type": "integer"
+        },
+        "timePerTurn": {
+          "type": "integer"
+        },
+        "speedrun": {
+          "type": "boolean"
+        },
+        "cardCycle": {
+          "type": "boolean"
+        },
+        "deckPlays": {
+          "type": "boolean"
+        },
+        "emptyClues": {
+          "type": "boolean"
+        },
+        "characterAssignments": {
+          "type": "array",
+          "items": {}
+        },
+        "characterMetadata": {
+          "type": "array",
+          "items": {}
+        },
+        "hypothetical": {
+          "type": "boolean"
+        },
+        "hypoActions": {
+          "type": "array",
+          "items": {}
+        },
+        "paused": {
+          "type": "boolean"
+        },
+        "pausePlayer": {
+          "type": "string"
+        },
+        "pauseQueued": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "baseTime",
+        "cardCycle",
+        "characterAssignments",
+        "characterMetadata",
+        "databaseID",
+        "deckPlays",
+        "emptyClues",
+        "hypoActions",
+        "hypothetical",
+        "names",
+        "pausePlayer",
+        "pauseQueued",
+        "paused",
+        "replay",
+        "seat",
+        "sharedReplay",
+        "spectating",
+        "speedrun",
+        "tableID",
+        "timePerTurn",
+        "timed",
+        "variant"
+      ],
+      "title": "Init"
+    }
+  }
+}

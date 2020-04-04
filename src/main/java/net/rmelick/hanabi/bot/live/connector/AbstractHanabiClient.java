@@ -21,21 +21,27 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-public class HanabiLiveClient {
-    private static final Logger LOG = Logger.getLogger(HanabiLiveClient.class.getName());
+/**
+ * A generic client that handles logging in and establishing the websocket
+ */
+public class AbstractHanabiClient {
+    private static final Logger LOG = Logger.getLogger(AbstractHanabiClient.class.getName());
     private static final String HANABI_LIVE_LOGIN_URL = "https://hanabi.live/login";
     private static final String HANABI_LIVE_WEBSOCKET_URL = "wss://hanabi.live/ws";
 
-    private final ObjectMapper _objectMapper = new ObjectMapper();
-    private final WorldState _worldState = new WorldState();
+    private final String _username;
+    private final String _password;
     private WebSocket _webSocket = null;
 
+    public AbstractHanabiClient(String username, String password) {
+        _username = username;
+        _password = password;
+    }
+
     public WebSocket connectWebsocket() throws InterruptedException, IOException {
-        String username = "rolls-bot-test1";
-        String password = "iamabot";
         Map<String, Object> data = new HashMap<>();
-        data.put("username", username);
-        data.put("password", password);
+        data.put("username", _username);
+        data.put("password", _password);
 
         CookieManager cookieManager = new CookieManager(new InMemoryNoMaxCookieStore(),
                 CookiePolicy.ACCEPT_ORIGINAL_SERVER);
@@ -52,7 +58,10 @@ public class HanabiLiveClient {
                 .build();
 
         // we can ignore the response from login, as all it does it set the cookies we want
-        client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> loginResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (loginResponse.statusCode() != 200) {
+            LOG.warning(String.format("Error when logging in %s, %s", loginResponse.statusCode(), loginResponse.body()));
+        }
 
         //now that we have a session cookie, open the websocket
         _webSocket = client.newWebSocketBuilder()
@@ -75,77 +84,20 @@ public class HanabiLiveClient {
         return HttpRequest.BodyPublishers.ofString(builder.toString());
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        new HanabiLiveClient().connectWebsocket();
-        Scanner userInput = new Scanner(System.in);
-        while(true) {
-            String input = userInput.nextLine();
-        }
-    }
-
     public boolean handleCommand(String command, String body) throws IOException {
         LOG.info(String.format("Received command %s body %s", command, body));
-        switch (command) {
-            case "hello":
-                return handleHello(_objectMapper.readValue(body, Hello.class));
-            case "tableList":
-                return handleTableList(_objectMapper.readValue(body, new TypeReference<List<Table>>() { }));
-            case "table":
-                return handleTableUpdate(_objectMapper.readValue(body, Table.class));
-            case "tableGone":
-                return handleTableGone(_objectMapper.readValue(body, TableGone.class));
-            case "tableProgress":
-            case "user":
-            case "userLeft":
-            case "chat":
-                // ignore for now, it's super spammy
-                return false;
-            default:
-                LOG.info(String.format("Unknown command %s %s", command, body));
-                return false;
-        }
-    }
-
-    private boolean handleHello(Hello hello) {
         return true;
-    }
-
-    private boolean handleTableList(List<Table> tables) {
-        _worldState.initializeTables(tables);
-        return true;
-    }
-
-    /*
-    Created or updated public/js/src/lobby/websocketInit.ts:97
-     */
-    private boolean handleTableUpdate(Table table) {
-        _worldState.updateTable(table);
-        return true;
-    }
-
-    private boolean handleTableGone(TableGone tableGone) {
-        _worldState.removeTable(tableGone.getID());
-        return true;
-    }
-
-    public WorldState getWorldState() {
-        return _worldState;
-    }
-
-    public void joinTable(Long tableID, String password) {
-        TableJoin command = new TableJoin();
-        command.setTableID(tableID);
-        command.setPassword(hashPassword(password));
-        String socketMessage = CommandParser.serialize("tableJoin", command);
-        LOG.info(String.format("Sending socket message %s", socketMessage));
-        _webSocket.sendText(socketMessage, true);
     }
 
     /*
     From public/js/src/modals.ts:63 passwordSubmit
      */
-    private static String hashPassword(String plainTextPassword) {
+    public static String hashPassword(String plainTextPassword) {
         String stringToHash = String.format("Hanabi game password %s", plainTextPassword);
         return DigestUtils.sha256Hex(stringToHash);
+    }
+
+    WebSocket getWebSocket() {
+        return _webSocket;
     }
 }
