@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/Table",
+  "definitions": {
+    "Table": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "boolean"
+        },
+        "joined": {
+          "type": "boolean"
+        },
+        "numPlayers": {
+          "type": "integer"
+        },
+        "owned": {
+          "type": "boolean"
+        },
+        "running": {
+          "type": "boolean"
+        },
+        "variant": {
+          "type": "string"
+        },
+        "timed": {
+          "type": "boolean"
+        },
+        "baseTime": {
+          "type": "integer"
+        },
+        "timePerTurn": {
+          "type": "integer"
+        },
+        "sharedReplay": {
+          "type": "boolean"
+        },
+        "progress": {
+          "type": "integer"
+        },
+        "players": {
+          "type": "string"
+        },
+        "spectators": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "baseTime",
+        "id",
+        "joined",
+        "name",
+        "numPlayers",
+        "owned",
+        "password",
+        "players",
+        "progress",
+        "running",
+        "sharedReplay",
+        "spectators",
+        "timePerTurn",
+        "timed",
+        "variant"
+      ],
+      "title": "Table"
+    }
+  }
+}

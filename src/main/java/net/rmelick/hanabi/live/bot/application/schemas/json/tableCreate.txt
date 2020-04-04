@@ -1,0 +1,1 @@
+tableCreate {"name":"test","variant":"No Variant","timed":false,"baseTime":120,"timePerTurn":20,"speedrun":false,"cardCycle":false,"deckPlays":false,"emptyClues":false,"characterAssignments":false,"password":"a15338622b45582e9b6a43dd081be4e74b08c09beeb980f980541ff078a814f3","alertWaiters":false}

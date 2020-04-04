@@ -14,11 +14,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -117,62 +115,15 @@ public class WebsocketTest {
         HttpResponse<String> secondResponse = client.send(secondRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println("Received second Response" + secondResponse.statusCode());
         //now that we have a session cookie, open the websocket
-        WebSocket webSocket = client.newWebSocketBuilder().buildAsync(URI.create(HANABI_LIVE_WEBSOCKET_URL), getListener()).join();
+        /*
+        WebSocket webSocket = client.newWebSocketBuilder().buildAsync(URI.create(HANABI_LIVE_WEBSOCKET_URL), new WebsocketListener(client)).join();
         webSocket.sendText("hello from the client", true);
 
         TimeUnit.SECONDS.sleep(10000);
         webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "ok");
+        */
     }
 
-    private static WebSocket.Listener getListener() {
-        return new WebSocket.Listener() {
-            @Override
-            public CompletionStage<?> onText(WebSocket webSocket,
-                                             CharSequence data, boolean last) {
-
-                System.out.println("onText: " + data);
-
-                return WebSocket.Listener.super.onText(webSocket, data, last);
-            }
-
-            @Override
-            public void onOpen(WebSocket webSocket) {
-                System.out.println("onOpen");
-                WebSocket.Listener.super.onOpen(webSocket);
-            }
-
-            @Override
-            public CompletionStage<?> onClose(WebSocket webSocket, int statusCode,
-                                              String reason) {
-                System.out.println("onClose: " + statusCode + " " + reason);
-                return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
-            }
-
-            @Override
-            public void onError(WebSocket webSocket, Throwable error) {
-                System.out.println("onError: " + error);
-                WebSocket.Listener.super.onError(webSocket, error);
-            }
-
-            @Override
-            public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-                System.out.println("onBinary: " + data);
-                return WebSocket.Listener.super.onBinary(webSocket, data, last);
-            }
-
-            @Override
-            public CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
-                System.out.println("onPing: " + message);
-                return WebSocket.Listener.super.onPing(webSocket, message);
-            }
-
-            @Override
-            public CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
-                System.out.println("onPong: " + message);
-                return WebSocket.Listener.super.onPong(webSocket, message);
-            }
-        };
-    }
 
     public static void runTyrus(){
         try {
@@ -231,4 +182,5 @@ public class WebsocketTest {
 
         new Scanner(System.in).nextLine(); // Don't close immediately.
     }
+
 }

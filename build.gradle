@@ -19,6 +19,8 @@ dependencies {
   compile 'org.springframework:spring-websocket'
   compile 'org.springframework:spring-messaging'
   compile group: 'org.glassfish.tyrus', name: 'tyrus-client', version: '1.16'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0'
+  compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
   runtime group: 'org.glassfish.tyrus', name: 'tyrus-container-grizzly-client', version: '1.16'
   testCompile('org.springframework.boot:spring-boot-starter-test')
   testCompile group: 'junit', name: 'junit', version: '4.12'

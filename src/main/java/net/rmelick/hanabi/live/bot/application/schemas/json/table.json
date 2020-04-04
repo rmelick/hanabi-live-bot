@@ -1,0 +1,17 @@
+{
+  "id": 4212,
+  "name": "Shared replay for game #106849",
+  "password": false,
+  "joined": false,
+  "numPlayers": 3,
+  "owned": false,
+  "running": true,
+  "variant": "Black (6 Suits)",
+  "timed": false,
+  "baseTime": 0,
+  "timePerTurn": 0,
+  "sharedReplay": true,
+  "progress": 100,
+  "players": "jbthea, cheikes, jonnydee",
+  "spectators": "jbthea, cheikes, jonnydee"
+}
