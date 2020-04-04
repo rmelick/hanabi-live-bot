@@ -1,4 +1,4 @@
-package servingwebcontent;
+package net.rmelick.hanabi.bot.webapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -23,7 +23,7 @@
  *
  */
 
-package net.rmelick.hanabi.live.bot.application;
+package net.rmelick.hanabi.bot.live.connector;
 
 import java.net.CookieStore;
 import java.net.HttpCookie;

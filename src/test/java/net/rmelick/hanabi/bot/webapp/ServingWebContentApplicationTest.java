@@ -1,4 +1,4 @@
-package servingwebcontent;/*
+package net.rmelick.hanabi.bot.webapp;/*
  * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,18 @@ package servingwebcontent;/*
  * limitations under the License.
  */
 
+import net.rmelick.hanabi.bot.webapp.GreetingController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
-import servingwebcontent.GreetingController;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest(controllers = GreetingController.class)
-public class ServingnWebContentApplicationTest {
+public class ServingWebContentApplicationTest {
 
 	@Autowired
 	private MockMvc mockMvc;

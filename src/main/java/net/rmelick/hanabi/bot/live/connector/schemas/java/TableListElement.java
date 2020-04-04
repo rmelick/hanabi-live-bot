@@ -1,6 +1,5 @@
-package net.rmelick.hanabi.live.bot.application.schemas.java;
+package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
-import java.util.*;
 import com.fasterxml.jackson.annotation.*;
 
 public class TableListElement {

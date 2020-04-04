@@ -1,8 +1,8 @@
-package net.rmelick.hanabi.live.bot.application;
+package net.rmelick.hanabi.bot.live.connector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.rmelick.hanabi.live.bot.application.schemas.java.Hello;
-import net.rmelick.hanabi.live.bot.application.schemas.java.TableListElement;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.TableListElement;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
