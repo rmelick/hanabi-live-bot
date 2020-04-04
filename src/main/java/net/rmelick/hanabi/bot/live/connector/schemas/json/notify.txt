@@ -2,3 +2,7 @@ notify {"type":"clue","clue":{"type":0,"value":1},"giver":0,"list":[6,7],"target
 notify {"type":"text","text":"rolls-brave tells rolls-chrome about two 1s"}
 notify {"type":"status","clues":7,"score":0,"maxScore":25,"doubleDiscard":false}
 notify {"type":"turn","num":1,"who":1}
+notify {"type":"clue","clue":{"type":0,"value":1},"giver":0,"list":[6],"target":1,"turn":0}
+notify {"type":"text","text":"rolls-brave tells rolls-bot-g0 about one 1"}
+notify {"type":"status","clues":7,"score":0,"maxScore":25,"doubleDiscard":false}
+notify {"type":"turn","num":1,"who":1}

@@ -28,4 +28,13 @@ public class WorldState {
     public void removeTable(long tableID) {
         _currentTables.remove(tableID);
     }
+
+    public Long getTableIDByName(String tableName) {
+        for (Table table : _currentTables.values()) {
+            if (table.getName().equals(tableName)) {
+                return table.getID();
+            }
+        }
+        return null;
+    }
 }

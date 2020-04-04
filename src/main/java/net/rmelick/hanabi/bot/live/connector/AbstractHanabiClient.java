@@ -85,7 +85,7 @@ public class AbstractHanabiClient {
     }
 
     public boolean handleCommand(String command, String body) throws IOException {
-        LOG.info(String.format("Received command %s body %s", command, body));
+        //LOG.info(String.format("Received command %s body %s", command, body));
         return true;
     }
 

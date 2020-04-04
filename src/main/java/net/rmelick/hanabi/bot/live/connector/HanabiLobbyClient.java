@@ -30,8 +30,12 @@ public class HanabiLobbyClient extends AbstractHanabiClient {
     private final ObjectMapper _objectMapper = new ObjectMapper();
     private final WorldState _worldState = new WorldState();
 
-    public HanabiLobbyClient() {
+    // TODO temp for easy debugging
+    private final ActiveGamesManager _activeGamesManager;
+
+    public HanabiLobbyClient(ActiveGamesManager activeGamesManager) {
         super("rolls-bot", "iamabot");
+        _activeGamesManager = activeGamesManager;
     }
 
     public void init() throws IOException, InterruptedException {
@@ -39,7 +43,6 @@ public class HanabiLobbyClient extends AbstractHanabiClient {
     }
 
     public boolean handleCommand(String command, String body) throws IOException {
-        LOG.info(String.format("Received command %s body %s", command, body));
         switch (command) {
             case "hello":
                 return handleHello(_objectMapper.readValue(body, Hello.class));
@@ -67,6 +70,13 @@ public class HanabiLobbyClient extends AbstractHanabiClient {
 
     private boolean handleTableList(List<Table> tables) {
         _worldState.initializeTables(tables);
+        //TODO temporary for easy restart testing
+        Long testId = getWorldState().getTableIDByName("test");
+        try {
+            _activeGamesManager.joinGame(testId, "123");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 

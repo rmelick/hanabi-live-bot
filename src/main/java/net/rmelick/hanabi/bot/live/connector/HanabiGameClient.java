@@ -27,12 +27,12 @@ public class HanabiGameClient extends AbstractHanabiClient {
     private static final AtomicInteger BOT_COUNTER = new AtomicInteger(0);
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
-    private final WorldState _worldState = new WorldState();
+    private GameState _gameState = new GameState();
     private final Long _gameID;
     private final String _gamePassword;
 
     public HanabiGameClient(Long gameID, String gamePassword) {
-        super("rolls-bot-g" + BOT_COUNTER.getAndIncrement(), "iamabot");
+        super("rolls-bot-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
         _gameID = gameID;
         _gamePassword = gamePassword;
     }
@@ -50,6 +50,12 @@ public class HanabiGameClient extends AbstractHanabiClient {
                 return handleTableUpdate(_objectMapper.readValue(body, Table.class));
             case "tableStart":
                 return handleTableStart(_objectMapper.readValue(body, TableStart.class));
+            case "init":
+                return handleInit(_objectMapper.readValue(body, Init.class));
+            case "action":
+                return handleAction();
+            case "notify":
+                return handleNotify(_objectMapper.readValue(body, Notify.class));
             case "tableProgress":
             case "user":
             case "userLeft":
@@ -65,11 +71,43 @@ public class HanabiGameClient extends AbstractHanabiClient {
     }
 
     /**
-     * Only received by a client connected to a game
+     * Updates have happened
      * @param readValue
      * @return
      */
-    private boolean handleTableStart(TableStart readValue) {
+    private boolean handleNotify(Notify readValue) {
+        return true;
+    }
+
+    /**
+     * it's our turn
+     * @return
+     */
+    private boolean handleAction() {
+        return true;
+    }
+
+    /**
+     * tableStart  - reply hello
+     * init - reply ready
+     * action (once it's our turn)
+     * @param init
+     * @return
+     */
+    private boolean handleInit(Init init) {
+        Ready ready = new Ready();
+        String socketMessage = CommandParser.serialize("ready", ready);
+        LOG.info(String.format("Sending socket message %s", socketMessage));
+        getWebSocket().sendText(socketMessage, true);
+        return true;
+    }
+
+    /**
+     * Only received by a client connected to a game
+     * @param tableStart
+     * @return
+     */
+    private boolean handleTableStart(TableStart tableStart) {
         Hello hello = new Hello();
         String socketMessage = CommandParser.serialize("hello", hello);
         LOG.info(String.format("Sending socket message %s", socketMessage));
@@ -81,7 +119,9 @@ public class HanabiGameClient extends AbstractHanabiClient {
     Created or updated public/js/src/lobby/websocketInit.ts:97
      */
     private boolean handleTableUpdate(Table table) {
-        _worldState.updateTable(table);
+        if (table.getID() == _gameID) {
+            _gameState.updateTable(table);
+        }
         return true;
     }
 

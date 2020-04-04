@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 @Controller
 public class TablesController {
 	private static final Logger LOG = Logger.getLogger(TablesController.class.getName());
-	private final HanabiLobbyClient _client = new HanabiLobbyClient();
 	private final ActiveGamesManager _gamesManager = new ActiveGamesManager();
+	private final HanabiLobbyClient _client = new HanabiLobbyClient(_gamesManager);
 
 	@PostConstruct
 	public void init() {

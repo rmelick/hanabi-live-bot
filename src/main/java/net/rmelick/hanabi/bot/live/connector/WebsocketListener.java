@@ -6,7 +6,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.logging.Logger;
 
 class WebsocketListener implements WebSocket.Listener {
-    private static final Logger LOG = Logger.getLogger(HanabiGameClient.class.getName());
+    private static final Logger LOG = Logger.getLogger(WebsocketListener.class.getName());
 
     private final AbstractHanabiClient _client;
     private StringBuffer _incomingText;
