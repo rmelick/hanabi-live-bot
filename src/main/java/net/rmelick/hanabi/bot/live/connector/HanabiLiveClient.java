@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.TableGone;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
@@ -89,6 +90,16 @@ public class HanabiLiveClient {
                 return handleHello(_objectMapper.readValue(body, Hello.class));
             case "tableList":
                 return handleTableList(_objectMapper.readValue(body, new TypeReference<List<Table>>() { }));
+            case "table":
+                return handleTableUpdate(_objectMapper.readValue(body, Table.class));
+            case "tableGone":
+                return handleTableGone(_objectMapper.readValue(body, TableGone.class));
+            case "tableProgress":
+            case "user":
+            case "userLeft":
+            case "chat":
+                // ignore for now, it's super spammy
+                return false;
             default:
                 System.out.println(String.format("Unknown command %s %s", command, body));
                 return false;
@@ -100,7 +111,20 @@ public class HanabiLiveClient {
     }
 
     private boolean handleTableList(List<Table> tables) {
-        _worldState.updateTables(tables);
+        _worldState.initializeTables(tables);
+        return true;
+    }
+
+    /*
+    Created or updated public/js/src/lobby/websocketInit.ts:97
+     */
+    private boolean handleTableUpdate(Table table) {
+        _worldState.updateTable(table);
+        return true;
+    }
+
+    private boolean handleTableGone(TableGone tableGone) {
+        _worldState.removeTable(tableGone.getID());
         return true;
     }
 

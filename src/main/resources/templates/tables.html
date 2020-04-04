@@ -1,15 +1,48 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head> 
-    <title>Getting Started: Serving Web Content</title> 
+    <title>Hanabi Live Bots</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
     <body>
-        <ul>
-        <li th:each="table: ${tables}">
-            <td th:text="${table.ID}" />
-            <td th:text="${table.name}" />
-        </li>
-        </ul>
+        <table>
+            <caption>Currently active games</caption>
+            <thead>
+                <tr>
+                    <th>Table ID</th>
+                    <th>Table Name</th>
+                    <th>Bot Type</th>
+                    <th>Password</th>
+                    <th>Join Button</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="table: ${tables}">
+                    <td th:text="${table.ID}" />
+                    <td th:text="${table.name}" />
+
+                    <td>
+                        <select th:form="${'joinTableForm' + table.ID}" name="bot">
+                            <option th:each="bot : ${bots}"
+                                    th:value="${bot}"
+                                    th:text="${bot}">
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <span th:if="${table.password}">
+                            <input th:form="${'joinTableForm' + table.ID}" type="text" id="password" name="password"/>
+                        </span>
+                        <span th:unless="${table.password}">No PW Required</span>
+                    </td>
+                    <td>
+                        <form th:id="${'joinTableForm' + table.ID}" action="/joinTable" method="post">
+                            <input type="submit" name="join" value="Join" />
+                            <input type="hidden" name="tableID" th:value="${table.ID}"/>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </body>
 </html>
