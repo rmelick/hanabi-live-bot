@@ -1,24 +1,20 @@
 package net.rmelick.hanabi.bot.live.connector;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
-import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
-import net.rmelick.hanabi.bot.live.connector.schemas.java.TableGone;
-import net.rmelick.hanabi.bot.live.connector.schemas.java.TableJoin;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 /**

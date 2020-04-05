@@ -1,6 +1,6 @@
 package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TableGone {
     private long id;

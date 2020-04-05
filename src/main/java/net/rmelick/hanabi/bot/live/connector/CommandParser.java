@@ -3,8 +3,6 @@ package net.rmelick.hanabi.bot.live.connector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-
 public class CommandParser {
     private static final ObjectMapper mapper = new ObjectMapper();
 

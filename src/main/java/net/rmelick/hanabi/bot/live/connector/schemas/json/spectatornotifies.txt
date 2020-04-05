@@ -62,3 +62,32 @@ notify {"type":"draw","who":0,"rank":3,"suit":3,"order":13}	59
 notify {"type":"status","clues":4,"score":3,"maxScore":25,"doubleDiscard":false}	80
 07:35:33.137
 notify {"type":"turn","num":9,"who":1}
+
+
+// played
+notify {"type":"play","which":{"index":0,"suit":0,"rank":1,"order":2}}	70
+10:51:02.930
+notify {"type":"text","text":"rolls-safari plays Red 1 from slot #3 (blind)"}	77
+10:51:02.948
+tableProgress {"id":548,"progress":4}	37
+10:51:02.951
+notify {"type":"draw","who":0,"rank":4,"suit":4,"order":12}	59
+10:51:02.952
+notify {"type":"status","clues":8,"score":1,"maxScore":25,"doubleDiscard":false}	80
+10:51:02.957
+notify {"type":"turn","num":3,"who":1}
+
+// misplayed
+notify {"type":"strike","num":2,"turn":1,"order":9}	51
+10:49:00.116
+notify {"type":"discard","failed":true,"which":{"index":1,"suit":4,"rank":2,"order":9}}	87
+10:49:00.118
+notify {"type":"text","text":"rolls-brave fails to play Purple 2 from slot #1 (blind)"}	87
+10:49:00.123
+notify {"type":"draw","who":1,"rank":3,"suit":1,"order":11}	59
+10:49:00.128
+notify {"type":"status","clues":8,"score":0,"maxScore":25,"doubleDiscard":true}	79
+10:49:00.131
+notify {"type":"turn","num":2,"who":0}	38
+10:49:00.133
+sound {"file":"fail2"}

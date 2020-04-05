@@ -3,12 +3,17 @@ package net.rmelick.hanabi.bot.live.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.ieee.LiveGameRunner;
-import net.rmelick.hanabi.bot.live.connector.schemas.java.*;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Init;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Notify;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Ready;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.TableSpectate;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.TableStart;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**

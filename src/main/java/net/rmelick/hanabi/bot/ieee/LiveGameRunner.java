@@ -4,35 +4,47 @@ import com.fossgalaxy.games.fireworks.ai.AgentPlayer;
 import com.fossgalaxy.games.fireworks.players.Player;
 import com.fossgalaxy.games.fireworks.state.GameState;
 import com.fossgalaxy.games.fireworks.state.actions.Action;
+import com.fossgalaxy.games.fireworks.state.actions.DiscardCard;
+import com.fossgalaxy.games.fireworks.state.actions.PlayCard;
 import com.fossgalaxy.games.fireworks.state.actions.TellColour;
 import com.fossgalaxy.games.fireworks.state.actions.TellValue;
-import com.fossgalaxy.games.fireworks.state.events.*;
+import com.fossgalaxy.games.fireworks.state.events.CardDrawn;
+import com.fossgalaxy.games.fireworks.state.events.CardInfoColour;
+import com.fossgalaxy.games.fireworks.state.events.CardInfoValue;
+import com.fossgalaxy.games.fireworks.state.events.CardReceived;
+import com.fossgalaxy.games.fireworks.state.events.GameEvent;
+import com.fossgalaxy.games.fireworks.state.events.GameInformation;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.ActionType;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Clue;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.ClueType;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Init;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Notify;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LiveGameRunner {
     private static final int[] HAND_SIZE = {-1, -1, 5, 5, 4, 4};
 
     private final Player _myPlayer;
-    private final String _hanabiLivePlayerName;
-    private int _hanabiLivePlayerId;
+    private final String _myHanabiLivePlayerName;
+    private int _myHanabiLivePlayerID;
     private GameState _gameState;
     private int _numPlayers;
     private Map<Integer, HandMapping> _playerHands;
 
     public LiveGameRunner(String hanabiLivePlayerName) {
-        _hanabiLivePlayerName = hanabiLivePlayerName;
-        _myPlayer = new AgentPlayer(_hanabiLivePlayerName, SampleAgents.buildCompRandom());
+        _myHanabiLivePlayerName = hanabiLivePlayerName;
+        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, SampleAgents.buildCompRandom());
     }
 
     public void init(Init initMessage) {
         List<String> playerNames = initMessage.getNames();
         _numPlayers = playerNames.size();
-        _hanabiLivePlayerId = playerNames.indexOf(_hanabiLivePlayerName);
+        _myHanabiLivePlayerID = playerNames.indexOf(_myHanabiLivePlayerName);
 
         _playerHands = new HashMap<>(_numPlayers);
         for (int playerID = 0; playerID < _numPlayers; playerID++) {
@@ -42,7 +54,7 @@ public class LiveGameRunner {
         _gameState = new StateBackedByHanabiLive(_numPlayers);
         _gameState.init();
 
-        _myPlayer.setID(_hanabiLivePlayerId, _numPlayers, playerNames.toArray(new String[0]));
+        _myPlayer.setID(_myHanabiLivePlayerID, _numPlayers, playerNames.toArray(new String[0]));
     }
 
     public void initialEvents(List<Notify> initials) {
@@ -97,35 +109,42 @@ public class LiveGameRunner {
 
     private List<GameEvent> convertInitialClue(Notify event) {
         Clue clue = event.getClue();
-        if (clue.getType() == 0) {
-            CardInfoValue info = new CardInfoValue(
-                    event.getWho().intValue(),
-                    event.getTarget().intValue(),
-                    (int) event.getClue().getValue(),
-                    _playerHands.get(event.getWho().intValue()).findSlotsOfHanabi(event.getList()),
-                    event.getTurn().intValue()
-            );
-            return Collections.singletonList(info);
-        } else if (clue.getType() == 1) {
-            CardInfoColour info = new CardInfoColour(
-                    event.getWho().intValue(),
-                    event.getTarget().intValue(),
-                    CardColors.getFromLiveId(clue.getValue()),
-                    _playerHands.get(event.getWho().intValue()).findSlotsOfHanabi(event.getList()),
-                    event.getTurn().intValue()
-                    );
-            return Collections.singletonList(info);
-        } else {
-            throw new IllegalArgumentException("Invalid clue type " + clue.getType());
+        ClueType type = ClueType.valueOfHanabiID((int) clue.getType())
+        switch (type) {
+            case RANK:
+                CardInfoValue rankInfo = new CardInfoValue(
+                        event.getWho().intValue(),
+                        event.getTarget().intValue(),
+                        (int) event.getClue().getValue(),
+                        _playerHands.get(event.getWho().intValue()).findSlotsOfHanabi(event.getList()),
+                        event.getTurn().intValue()
+                );
+                return Collections.singletonList(rankInfo);
+            case COLOR:
+                CardInfoColour colorInfo = new CardInfoColour(
+                        event.getWho().intValue(),
+                        event.getTarget().intValue(),
+                        CardColors.getFromLiveId(clue.getValue()),
+                        _playerHands.get(event.getWho().intValue()).findSlotsOfHanabi(event.getList()),
+                        event.getTurn().intValue()
+                );
+                return Collections.singletonList(colorInfo);
+            default:
+                throw new IllegalArgumentException("Unknown clue type " + type);
         }
+
     }
 
     private Action convertClue(Notify event) {
         Clue clue = event.getClue();
-        if (clue.getType() == 0) {
-            return new TellValue(event.getTarget().intValue(), (int) clue.getValue());
-        } else {
-            return new TellColour(event.getTarget().intValue(), CardColors.getFromLiveId(clue.getValue()));
+        ClueType type = ClueType.valueOfHanabiID((int) clue.getType())
+        switch (type) {
+            case RANK:
+                return new TellValue(event.getTarget().intValue(), (int) clue.getValue());
+            case COLOR:
+                return new TellColour(event.getTarget().intValue(), CardColors.getFromLiveId(clue.getValue()));
+            default:
+                throw new IllegalArgumentException("Unknown clue type " + type);
         }
     }
 
@@ -140,57 +159,30 @@ public class LiveGameRunner {
         return false;
     }
 
-    /**
-     * IEEE Agents draw to replace, and Hanabi Live doesn't really keep track of slots, it uses the overal
-     * deck index as the card id
-     */
-    private static class HandMapping {
-        /**
-         * Return the slot the card was put into
-         * @param hanabiLiveOrder
-         * @return
-         */
-        private final List<Integer> _ieeeToHanabi;
-        private Queue<Integer> _nextDrawSpot;
+    public net.rmelick.hanabi.bot.live.connector.schemas.java.Action getNextPlayerMove() {
+        Action nextAction = _myPlayer.getAction();
+        return convertIEEEActionToHanabiLive(nextAction);
+    }
 
-        public HandMapping(int numCardsForHand) {
-            _ieeeToHanabi = new ArrayList<>(numCardsForHand);
-            _nextDrawSpot = new LinkedList<>();
-            for (int i = 0; i < numCardsForHand; i++) {
-                _nextDrawSpot.add(i);
-                _ieeeToHanabi.add(-1);
-            }
-        }
+    private net.rmelick.hanabi.bot.live.connector.schemas.java.Action convertIEEEActionToHanabiLive(Action action) {
+        net.rmelick.hanabi.bot.live.connector.schemas.java.Action liveAction = new net.rmelick.hanabi.bot.live.connector.schemas.java.Action();
+        if (action instanceof DiscardCard) {
+            DiscardCard discard = (DiscardCard) action;
+            int hanabiIDToDiscard = _playerHands.get(_myHanabiLivePlayerID).getHanabiInSlot(discard.slot);
+            liveAction.setTarget(hanabiIDToDiscard);
+            liveAction.setType(ActionType.DISCARD.getHanabiLiveID());
+        } else if (action instanceof PlayCard) {
+            PlayCard play = (PlayCard) action;
+            int hanabiIDToPlay = _playerHands.get(_myHanabiLivePlayerID).getHanabiInSlot(play.slot);
+            liveAction.setTarget(hanabiIDToPlay);
+            liveAction.setType(ActionType.PLAY.getHanabiLiveID());
+        } else if (action instanceof TellValue) {
 
-        public int recordHanabiDraw(int hanabiLiveOrder) {
-            int slotTaken = _nextDrawSpot.remove();
-            _ieeeToHanabi.set(slotTaken, hanabiLiveOrder);
-            return slotTaken;
-        }
+        } else if (action instanceof TellColour) {
 
-
-        /**
-         *
-         * @param hanabiLiveOrder
-         * @return the slot that hanabi card is in
-         */
-        public int findSlotOfHanabi(Long hanabiLiveOrder) {
-            return _ieeeToHanabi.indexOf(hanabiLiveOrder.intValue());
-        }
-
-        public List<Integer> findSlotsOfHanabi(List<Long> hanabiLiveOrders) {
-            return hanabiLiveOrders.stream().map(this::findSlotOfHanabi).collect(Collectors.toList());
-        }
-
-        /**
-         *
-         * @param hanabiLiveOrder
-         * @return the slot that was freed up by the play
-         */
-        public int recordHanabiPlay(int hanabiLiveOrder) {
-            int index = _ieeeToHanabi.indexOf(hanabiLiveOrder);
-            _ieeeToHanabi.remove(index);
-            return index;
+        } else {
+            throw new IllegalArgumentException("Unknown action " + action);
         }
     }
+
 }

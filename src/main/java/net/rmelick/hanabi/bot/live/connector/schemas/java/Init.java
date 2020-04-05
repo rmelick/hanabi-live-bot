@@ -1,8 +1,9 @@
 
 package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
-import java.util.*;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class Init {
     private long baseTime;

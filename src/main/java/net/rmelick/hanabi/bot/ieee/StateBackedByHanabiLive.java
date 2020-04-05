@@ -4,8 +4,6 @@ import com.fossgalaxy.games.fireworks.state.BasicState;
 import com.fossgalaxy.games.fireworks.state.Card;
 import com.fossgalaxy.games.fireworks.state.Deck;
 
-import java.lang.reflect.Field;
-
 public class StateBackedByHanabiLive extends BasicState {
     public StateBackedByHanabiLive(int playerCount) {
         super(playerCount);

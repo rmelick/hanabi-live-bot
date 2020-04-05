@@ -1,1 +1,3 @@
 action null
+action {"type":1,"target":9}
+action {"type":0,"target":0,"clue":{"type":0,"value":4}}

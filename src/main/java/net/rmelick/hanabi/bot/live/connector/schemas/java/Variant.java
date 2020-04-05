@@ -1,7 +1,9 @@
 package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.io.IOException;
-import com.fasterxml.jackson.annotation.*;
 
 public enum Variant {
     BLACK_6_SUITS, NO_VARIANT, RAINBOW_6_SUITS, THE_6_SUITS;
