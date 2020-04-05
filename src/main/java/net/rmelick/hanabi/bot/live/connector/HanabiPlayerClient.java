@@ -5,6 +5,7 @@ import net.rmelick.hanabi.bot.live.connector.schemas.java.*;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -15,9 +16,10 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
     private static final AtomicInteger BOT_COUNTER = new AtomicInteger(0);
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
-    private GameState _gameState = new GameState();
+    private MyGameState _myGameState = new MyGameState();
     private final Long _gameID;
     private final String _gamePassword;
+    private Consumer<TableStart> _tableStartCallback;
 
     public HanabiPlayerClient(Long gameID, String gamePassword) {
         super("rolls-bot-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
@@ -100,6 +102,8 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         String socketMessage = CommandParser.serialize("hello", hello);
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
+        // we can also tell the observer to connect
+        _tableStartCallback.accept(tableStart);
         return true;
     }
 
@@ -108,7 +112,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
      */
     private boolean handleTableUpdate(Table table) {
         if (table.getID() == _gameID) {
-            _gameState.updateTable(table);
+            _myGameState.updateTable(table);
         }
         return true;
     }
@@ -120,5 +124,9 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         String socketMessage = CommandParser.serialize("tableJoin", command);
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
+    }
+
+    public void setTableStartCallback(Consumer<TableStart> tableStartCallback) {
+        _tableStartCallback = tableStartCallback;
     }
 }

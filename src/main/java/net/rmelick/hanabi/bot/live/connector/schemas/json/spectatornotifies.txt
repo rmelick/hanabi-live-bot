@@ -1,0 +1,17 @@
+// clued about the 3s, which were in positions 0, 3, and 4 in their hand (starting at the right, 0 indexed)
+notify {"type":"clue","clue":{"type":0,"value":3},"giver":0,"list":[5,8,9],"target":1,"turn":0}	95
+21:16:27.297
+notify {"type":"text","text":"rolls-chrome tells rolls-safari about three 3s"}	78
+21:16:27.330
+notify {"type":"status","clues":7,"score":0,"maxScore":25,"doubleDiscard":false}	80
+21:16:27.332
+notify {"type":"turn","num":1,"who":1}
+
+// clued about the purple, which was in position 1 (starting at the right, 0 indexed)
+notify {"type":"clue","clue":{"type":1,"value":4},"giver":1,"list":[1],"target":0,"turn":1}	91
+21:17:35.811
+notify {"type":"text","text":"rolls-safari tells rolls-chrome about one Purple"}	80
+21:17:35.837
+notify {"type":"status","clues":6,"score":0,"maxScore":25,"doubleDiscard":false}	80
+21:17:35.846
+notify {"type":"turn","num":2,"who":0}
