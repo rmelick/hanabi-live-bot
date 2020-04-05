@@ -99,7 +99,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
      */
     private boolean handleTableStart(TableStart tableStart) {
         Hello hello = new Hello();
-        String socketMessage = CommandParser.serialize("hello", hello);
+        String socketMessage = "hello {}";
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
         // we can also tell the observer to connect

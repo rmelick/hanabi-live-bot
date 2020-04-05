@@ -60,7 +60,7 @@ class WebsocketListener implements WebSocket.Listener {
 
     @Override
     public void onError(WebSocket webSocket, Throwable error) {
-        LOG.info("onError: " + error);
+        LOG.warning("onError: " + error);
         WebSocket.Listener.super.onError(webSocket, error);
     }
 }

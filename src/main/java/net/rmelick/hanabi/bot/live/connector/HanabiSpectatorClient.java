@@ -36,6 +36,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     @Override
     public boolean handleCommand(String command, String body) throws IOException {
+        LOG.info(String.format("Received command %s %s", command, body));
         super.handleCommand(command, body);
         switch (command) {
             case "table":
@@ -116,7 +117,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     public void spectateTable() {
         TableSpectate command = new TableSpectate();
         command.setTableID(_gameID);
-        String socketMessage = CommandParser.serialize("spectateTable", command);
+        String socketMessage = CommandParser.serialize("tableSpectate", command);
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
     }

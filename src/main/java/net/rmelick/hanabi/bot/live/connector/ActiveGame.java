@@ -25,8 +25,8 @@ public class ActiveGame {
     }
 
     public void init() throws IOException, InterruptedException {
-        _playerClient.init();
         _spectatorClient.init();
+        _playerClient.init();
     }
 
 }
