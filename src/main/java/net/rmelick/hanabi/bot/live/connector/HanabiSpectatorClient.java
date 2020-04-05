@@ -10,6 +10,7 @@ import net.rmelick.hanabi.bot.live.connector.schemas.java.Ready;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableSpectate;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableStart;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Warning;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,6 +59,8 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
                 return handleNotify(_objectMapper.readValue(body, Notify.class));
             case "notifyList":
                 return handleNotifyList(_objectMapper.readValue(body, new TypeReference<List<Notify>>() {}));
+            case "warning":
+                return handleWarning(_objectMapper.readValue(body, Warning.class));
             case "tableProgress":
             case "user":
             case "userLeft":
@@ -84,6 +87,10 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
                 return _liveGameRunner.recordStrike(notify);
             case DISCARD:
                 return _liveGameRunner.recordDiscard(notify);
+            case PLAY:
+                return _liveGameRunner.recordPlay(notify);
+            case DRAW:
+                return _liveGameRunner.recordDraw(notify);
             case TURN:
                 // TODO but do we need to track it for strikes, etc.
                 return true; // the PlayerClient handles notification that it is it's turn,
@@ -146,6 +153,17 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
         return true;
+    }
+
+    private boolean handleWarning(Warning warning) {
+        if ("You are already spectating another table.".equals(warning.getWarning())) {
+            String socketMessage = "tableUnattend {}";
+            LOG.info(String.format("Sending socket message %s", socketMessage));
+            getWebSocket().sendText(socketMessage, true);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

@@ -1,7 +1,9 @@
 package net.rmelick.hanabi.bot.ieee;
 
 import com.fossgalaxy.games.fireworks.ai.AgentPlayer;
+import com.fossgalaxy.games.fireworks.ai.iggi.IGGIFactory;
 import com.fossgalaxy.games.fireworks.players.Player;
+import com.fossgalaxy.games.fireworks.state.Card;
 import com.fossgalaxy.games.fireworks.state.CardColour;
 import com.fossgalaxy.games.fireworks.state.GameState;
 import com.fossgalaxy.games.fireworks.state.actions.Action;
@@ -32,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LiveGameRunner {
@@ -40,14 +44,15 @@ public class LiveGameRunner {
     private final Player _myPlayer;
     private final String _myHanabiLivePlayerName;
     private int _myHanabiLivePlayerID;
-    private GameState _gameState;
+    private StateBackedByHanabiLive _gameState;
     private int _numPlayers;
     private Map<Integer, HandMapping> _playerHands;
-    //private Queue<Notify> _pendingStrikes = new ConcurrentLinkedQueue<>();
+    private final CountDownLatch _initCompleted = new CountDownLatch(1);
+    //private BlockingQueue<Notify> _pendingStrikes = new LinkedBlockingQueue<>();
 
     public LiveGameRunner(String hanabiLivePlayerName) {
         _myHanabiLivePlayerName = hanabiLivePlayerName;
-        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, SampleAgents.buildCompRandom());
+        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, IGGIFactory.buildCautious());
     }
 
     public void init(Init initMessage) {
@@ -64,6 +69,7 @@ public class LiveGameRunner {
         _gameState.init();
 
         _myPlayer.setID(_myHanabiLivePlayerID, _numPlayers, playerNames.toArray(new String[0]));
+        _initCompleted.countDown();
     }
 
     public void initialEvents(List<Notify> initials) {
@@ -120,7 +126,7 @@ public class LiveGameRunner {
                 playerIndex,
                 handIndex,
                 true, //TODO handle the final draw correctly saying there are no more cards left
-                0);
+                0); // TODO handle looking for turns when importing a big game
         return List.of(cardDrawn, cardReceived);
     }
 
@@ -222,7 +228,7 @@ public class LiveGameRunner {
                     playedSlot,
                     playedCardColor,
                     playedCardRank,
-                    previous.getTurn().intValue()
+                    previous.getNum().intValue()
             );
             return Collections.singletonList(play);
         } else {
@@ -238,6 +244,16 @@ public class LiveGameRunner {
         int playedSlot = playerHand.findSlotOfHanabi(which.getOrder());
         PlayCard playAction = new PlayCard(playedSlot);
         playAction.apply(playerIndex, _gameState);
+        return true;
+    }
+
+    public boolean recordDraw(Notify event) {
+        int playerIndex = event.getWho().intValue();
+        int handIndex = _playerHands.get(playerIndex).recordHanabiDraw(event.getOrder().intValue());
+
+        Card drawnCard = new Card(event.getRank().intValue(), CardColors.getFromLiveId(event.getSuit()));
+        _gameState.makeCardAvailableToDraw(drawnCard);
+
         return true;
     }
 
@@ -288,6 +304,11 @@ public class LiveGameRunner {
     }
 
     public net.rmelick.hanabi.bot.live.connector.schemas.java.Action getNextPlayerMove() {
+        try {
+            _initCompleted.await(2, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException("Timeout waiting for spectator to initialize GameRunner", e);
+        }
         Action nextAction = _myPlayer.getAction();
         return convertIEEEActionToHanabiLive(nextAction);
     }

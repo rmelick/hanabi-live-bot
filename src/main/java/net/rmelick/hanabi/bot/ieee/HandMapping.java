@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -19,11 +21,11 @@ class HandMapping {
      * @return
      */
     private final Integer[] _ieeeToHanabi;
-    private Queue<Integer> _nextDrawSpot;
+    private final BlockingQueue<Integer> _nextDrawSpot;
 
     public HandMapping(int numCardsForHand) {
         _ieeeToHanabi = new Integer[numCardsForHand];
-        _nextDrawSpot = new LinkedList<>();
+        _nextDrawSpot = new LinkedBlockingQueue<>();
         for (int i = 0; i < numCardsForHand; i++) {
             _nextDrawSpot.add(i);
             _ieeeToHanabi[i] = null;
