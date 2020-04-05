@@ -66,6 +66,12 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
             case "userLeft":
             case "chat":
             case "tableGone":
+            case "connected":
+            case "clock":
+            case "noteList":
+            case "chatList":
+            case "spectators":
+            case "userInactive":
                 // ignore for now, it's super spammy
                 return true;
             default:

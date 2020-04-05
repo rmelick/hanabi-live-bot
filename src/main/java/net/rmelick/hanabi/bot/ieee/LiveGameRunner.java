@@ -243,7 +243,8 @@ public class LiveGameRunner {
         HandMapping playerHand = _playerHands.get(playerIndex);
         int playedSlot = playerHand.findSlotOfHanabi(which.getOrder());
         PlayCard playAction = new PlayCard(playedSlot);
-        playAction.apply(playerIndex, _gameState);
+        List<GameEvent> resultingEvents = playAction.apply(playerIndex, _gameState);
+        _myPlayer.resolveTurn(playerIndex, playAction, resultingEvents);
         return true;
     }
 
@@ -274,7 +275,8 @@ public class LiveGameRunner {
             // just a plain discard
             action = new DiscardCard(discardedSlot);
         }
-        action.apply(playerIndex, _gameState);
+        List<GameEvent> resultingEvents = action.apply(playerIndex, _gameState);
+        _myPlayer.resolveTurn(playerIndex, action, resultingEvents);
         return true;
     }
 
@@ -286,7 +288,8 @@ public class LiveGameRunner {
     public boolean recordClue(Notify event) {
         Action clueAction = convertClue(event);
         Long giverID = event.getGiver();
-        clueAction.apply(giverID.intValue(), _gameState);
+        List<GameEvent> resultingEvents = clueAction.apply(giverID.intValue(), _gameState);
+        _myPlayer.resolveTurn(giverID.intValue(), clueAction, resultingEvents);
         return true;
     }
 

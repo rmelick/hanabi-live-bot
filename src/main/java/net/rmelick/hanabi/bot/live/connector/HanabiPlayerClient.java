@@ -66,6 +66,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
             case "tableGone":
             case "tableList":
             case "sound":
+            case "clock":
                 // ignore for now, it's super spammy
                 return true;
             default:
