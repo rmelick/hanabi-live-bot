@@ -30,6 +30,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LiveGameRunner {
     private static final int[] HAND_SIZE = {-1, -1, 5, 5, 4, 4};
@@ -40,6 +43,7 @@ public class LiveGameRunner {
     private GameState _gameState;
     private int _numPlayers;
     private Map<Integer, HandMapping> _playerHands;
+    //private Queue<Notify> _pendingStrikes = new ConcurrentLinkedQueue<>();
 
     public LiveGameRunner(String hanabiLivePlayerName) {
         _myHanabiLivePlayerName = hanabiLivePlayerName;
@@ -89,6 +93,8 @@ public class LiveGameRunner {
                 return convertInitialStrike(event);
             case DISCARD:
                 return convertInitialDiscard(event, previous);
+            case PLAY:
+                return convertInitialPlay(event, previous);
             case STATUS:
             case TEXT:
             case TURN: // not sure about this, we may want it
@@ -187,17 +193,85 @@ public class LiveGameRunner {
             return Collections.singletonList(play);
         } else if (previous != null && Type.TURN == previous.getType()) {
             // just a plain discard
-            CardDiscarded play = new CardDiscarded(
+            CardDiscarded discard = new CardDiscarded(
                     playerIndex,
                     discardedSlot,
                     discardedCardColor,
                     discardCardRank,
                     previous.getNum().intValue()
             );
-            return Collections.singletonList(play);
+            return Collections.singletonList(discard);
         } else {
             throw new IllegalStateException("Invalid sequence, couldn't find previous turn info for discard");
         }
+    }
+
+    private List<GameEvent> convertInitialPlay(Notify event, Notify previous) {
+        Which which = event.getWhich();
+        int playerIndex = (int) which.getIndex();
+        HandMapping playerHand = _playerHands.get(playerIndex);
+        int playedSlot = playerHand.findSlotOfHanabi(which.getOrder());
+        CardColour playedCardColor = CardColors.getFromLiveId(which.getSuit());
+        int playedCardRank = (int) which.getRank();
+
+        playerHand.recordHanabiPlay((int) which.getOrder());
+
+        if (previous != null && Type.TURN == previous.getType()) {
+            CardPlayed play = new CardPlayed(
+                    playerIndex,
+                    playedSlot,
+                    playedCardColor,
+                    playedCardRank,
+                    previous.getTurn().intValue()
+            );
+            return Collections.singletonList(play);
+        } else {
+            throw new IllegalStateException("Invalid sequence, couldn't find 'turn' before 'play'");
+        }
+    }
+
+
+    public boolean recordPlay(Notify event) {
+        Which which = event.getWhich();
+        int playerIndex = (int) which.getIndex();
+        HandMapping playerHand = _playerHands.get(playerIndex);
+        int playedSlot = playerHand.findSlotOfHanabi(which.getOrder());
+        PlayCard playAction = new PlayCard(playedSlot);
+        playAction.apply(playerIndex, _gameState);
+        return true;
+    }
+
+    public boolean recordDiscard(Notify event) {
+        Which which = event.getWhich();
+        int playerIndex = (int) which.getIndex();
+        HandMapping playerHand = _playerHands.get(playerIndex);
+        int discardedSlot = playerHand.findSlotOfHanabi(which.getOrder());
+
+        playerHand.recordHanabiDiscard((int) which.getOrder());
+
+        Action action;
+        if (event.getFailed()) {
+            // failed discards are from a misplay
+            // for IEEE, we convert it back to a CardPlayed and let the local state handle the failure
+            action = new PlayCard(discardedSlot);
+        } else {
+            // just a plain discard
+            action = new DiscardCard(discardedSlot);
+        }
+        action.apply(playerIndex, _gameState);
+        return true;
+    }
+
+    public boolean recordStrike(Notify event) {
+        //return _pendingStrikes.add(event);
+        return true; // maybe we don't need to do this, if the turn tracking works ok
+    }
+
+    public boolean recordClue(Notify event) {
+        Action clueAction = convertClue(event);
+        Long giverID = event.getGiver();
+        clueAction.apply(giverID.intValue(), _gameState);
+        return true;
     }
 
     private Action convertClue(Notify event) {
@@ -211,17 +285,6 @@ public class LiveGameRunner {
             default:
                 throw new IllegalArgumentException("Unknown clue type " + type);
         }
-    }
-
-    public boolean recordClue(Notify event) {
-        Action clueAction = convertClue(event);
-        Long giverID = event.getGiver();
-        clueAction.apply(giverID.intValue(), _gameState);
-        return true;
-    }
-
-    public boolean recordPlay(Notify event) {
-        return false;
     }
 
     public net.rmelick.hanabi.bot.live.connector.schemas.java.Action getNextPlayerMove() {

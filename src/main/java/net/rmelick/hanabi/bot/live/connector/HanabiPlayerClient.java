@@ -84,6 +84,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
             case TURN:
                 return handleNotifyTurn(notify);
             case CLUE:
+            case STRIKE:
                 return true; // handled by the Spectator
             case TEXT:
             case STATUS:

@@ -80,13 +80,18 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
         switch (notify.getType()) {
             case CLUE:
                 return _liveGameRunner.recordClue(notify);
+            case STRIKE:
+                return _liveGameRunner.recordStrike(notify);
+            case DISCARD:
+                return _liveGameRunner.recordDiscard(notify);
             case TURN:
-                return true; // the PlayerClient handles notification that it is it's turn
+                // TODO but do we need to track it for strikes, etc.
+                return true; // the PlayerClient handles notification that it is it's turn,
             case TEXT:
             case STATUS:
                 return true; // don't care about display stuff
             default:
-                return false;
+                throw new IllegalArgumentException("Unknown notify");
         }
     }
 
