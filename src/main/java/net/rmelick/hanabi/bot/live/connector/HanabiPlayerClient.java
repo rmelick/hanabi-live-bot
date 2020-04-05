@@ -1,10 +1,13 @@
 package net.rmelick.hanabi.bot.live.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.ieee.LiveGameRunner;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.*;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -36,7 +39,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
 
     @Override
     public boolean handleCommand(String command, String body) throws IOException {
-        super.handleCommand(command, body);
+        LOG.info(String.format("Received command %s %s", command, body));
         switch (command) {
             case "table":
                 return handleTableUpdate(_objectMapper.readValue(body, Table.class));
@@ -48,6 +51,8 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
                 return handleAction();
             case "notify":
                 return handleNotify(_objectMapper.readValue(body, Notify.class));
+            case "notifyList":
+                return handleNotifyList(_objectMapper.readValue(body, new TypeReference<List<Notify>>() {}));
             case "tableProgress":
             case "user":
             case "userLeft":
@@ -104,6 +109,23 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         String socketMessage = "hello {}";
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
+        return true;
+    }
+
+    /**
+     * If we re-join / resume a game, we need to know whose turn it is
+     * @param notifies
+     * @return
+     */
+    private boolean handleNotifyList(List<Notify> notifies) {
+        // look for the most recent turn notification
+        Collections.reverse(notifies);
+        for (Notify notify : notifies) {
+            if (notify.getType().equals("turn")) {
+                LOG.info(String.format("Most recent turn is %s waiting for player %s", notify.getNum(), notify.getWho()));
+
+            }
+        }
         return true;
     }
 

@@ -17,11 +17,6 @@ public class ActiveGame {
         HanabiSpectatorClient spectatorClient = new HanabiSpectatorClient(gameID, _liveGameRunner);
         _playerClient = playerClient;
         _spectatorClient = spectatorClient;
-        _playerClient.setTableStartCallback(this::connectSpectatorToGame);
-    }
-
-    private void connectSpectatorToGame(TableStart tableStart) {
-        _spectatorClient.spectateTable(); // it already knows its ID
     }
 
     public void init() throws IOException, InterruptedException {

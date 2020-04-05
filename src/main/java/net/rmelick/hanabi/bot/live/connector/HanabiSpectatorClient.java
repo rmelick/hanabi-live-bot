@@ -39,8 +39,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     @Override
     public boolean handleCommand(String command, String body) throws IOException {
-        LOG.info(String.format("Received command %s %s", command, body));
-        super.handleCommand(command, body);
+        //LOG.info(String.format("Received command %s %s", command, body));
         switch (command) {
             case "table":
                 return handleTableUpdate(_objectMapper.readValue(body, Table.class));
