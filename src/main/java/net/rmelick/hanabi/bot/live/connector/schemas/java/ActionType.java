@@ -24,9 +24,7 @@ import java.util.Map;
 public enum ActionType {
     CLUE(0),
     PLAY(1),
-    DISCARD(2),
-    COLOR_CLUE(3),
-    NUMBER_CLUE(4);
+    DISCARD(2);
 
     private final int _hanabiLiveID;
 

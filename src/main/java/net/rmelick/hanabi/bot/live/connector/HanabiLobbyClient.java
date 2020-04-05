@@ -60,7 +60,7 @@ public class HanabiLobbyClient extends AbstractHanabiClient {
     private boolean handleTableList(List<Table> tables) {
         _worldState.initializeTables(tables);
         //TODO temporary for easy restart testing
-        Long testId = getWorldState().getTableIDByName("test");
+        Long testId = getWorldState().getTableIDByName("test3");
         try {
             _activeGamesManager.joinGame(testId, "123");
         } catch (IOException | InterruptedException e) {

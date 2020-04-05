@@ -3,6 +3,7 @@ package net.rmelick.hanabi.bot.live.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.ieee.LiveGameRunner;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Action;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Hello;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Init;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Notify;
@@ -10,6 +11,7 @@ import net.rmelick.hanabi.bot.live.connector.schemas.java.Ready;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableJoin;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableStart;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Type;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -79,13 +81,15 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
      */
     private boolean handleNotify(Notify notify) {
         switch (notify.getType()) {
-            case "turn":
+            case TURN:
                 return handleNotifyTurn(notify);
-            case "text":
-            case "status":
+            case CLUE:
+                return true; // handled by the Spectator
+            case TEXT:
+            case STATUS:
                 return true; // don't care about display stuff
             default:
-                return false;
+                throw new IllegalArgumentException("Invalid Notify");
         }
     }
 
@@ -137,7 +141,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         // look for the most recent turn notification
         Collections.reverse(notifies);
         for (Notify notify : notifies) {
-            if (notify.getType().equals("turn")) {
+            if (notify.getType().equals(Type.TURN)) {
                 LOG.info(String.format("Most recent turn is %s waiting for player %s", notify.getNum(), notify.getWho()));
                 return handleNotifyTurn(notify);
             }
@@ -159,7 +163,10 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
 
     private boolean takeTurn() {
         LOG.info("It's my turn!!!");
-        _liveGameRunner.
+        Action nextMove = _liveGameRunner.getNextPlayerMove();
+        String socketMessage = CommandParser.serialize("action", nextMove);
+        LOG.info(String.format("Sending socket message %s", socketMessage));
+        getWebSocket().sendText(socketMessage, true);
         return true;
     }
     /*

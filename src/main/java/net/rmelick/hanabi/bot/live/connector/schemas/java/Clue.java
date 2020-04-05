@@ -1,6 +1,7 @@
 package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.*;
+import com.fasterxml.jackson.annotation.*;
 
 public class Clue {
     private long type;
@@ -15,4 +16,12 @@ public class Clue {
     public long getValue() { return value; }
     @JsonProperty("value")
     public void setValue(long value) { this.value = value; }
+
+    @Override
+    public String toString() {
+        return "Clue{" +
+                "type=" + type +
+                ", value=" + value +
+                '}';
+    }
 }

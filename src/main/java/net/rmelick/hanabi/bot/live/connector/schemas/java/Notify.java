@@ -1,11 +1,12 @@
+// NotifyListElement.java
+
 package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
+import java.util.*;
+import com.fasterxml.jackson.annotation.*;
 
 public class Notify {
-    private String type;
+    private Type type;
     private Long who;
     private Long rank;
     private Long suit;
@@ -16,16 +17,19 @@ public class Notify {
     private Boolean doubleDiscard;
     private String text;
     private Long num;
+    private Long turn;
+    private Boolean failed;
+    private Which which;
     private Clue clue;
     private Long giver;
     private List<Long> list;
     private Long target;
-    private Long turn;
+    private List<Deck> deck;
 
     @JsonProperty("type")
-    public String getType() { return type; }
+    public Type getType() { return type; }
     @JsonProperty("type")
-    public void setType(String value) { this.type = value; }
+    public void setType(Type value) { this.type = value; }
 
     @JsonProperty("who")
     public Long getWho() { return who; }
@@ -77,6 +81,21 @@ public class Notify {
     @JsonProperty("num")
     public void setNum(Long value) { this.num = value; }
 
+    @JsonProperty("turn")
+    public Long getTurn() { return turn; }
+    @JsonProperty("turn")
+    public void setTurn(Long value) { this.turn = value; }
+
+    @JsonProperty("failed")
+    public Boolean getFailed() { return failed; }
+    @JsonProperty("failed")
+    public void setFailed(Boolean value) { this.failed = value; }
+
+    @JsonProperty("which")
+    public Which getWhich() { return which; }
+    @JsonProperty("which")
+    public void setWhich(Which value) { this.which = value; }
+
     @JsonProperty("clue")
     public Clue getClue() { return clue; }
     @JsonProperty("clue")
@@ -97,8 +116,24 @@ public class Notify {
     @JsonProperty("target")
     public void setTarget(Long value) { this.target = value; }
 
-    @JsonProperty("turn")
-    public Long getTurn() { return turn; }
-    @JsonProperty("turn")
-    public void setTurn(Long value) { this.turn = value; }
+    @JsonProperty("deck")
+    public List<Deck> getDeck() { return deck; }
+    @JsonProperty("deck")
+    public void setDeck(List<Deck> value) { this.deck = value; }
+
+    @Override
+    public String toString() {
+        String inner = "type=" + type + ", ";
+        if (type == Type.CLUE) {
+            inner +=
+                    "clue=" + clue +
+                    ", giver=" + giver +
+                    ", list=" + list;
+        } else {
+            inner += ", who=" + who +
+                    ", order=" + order +
+                    ", turn=" + turn;
+        }
+        return "Notify{" + inner + '}';
+    }
 }

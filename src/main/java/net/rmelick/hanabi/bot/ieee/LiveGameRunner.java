@@ -2,15 +2,18 @@ package net.rmelick.hanabi.bot.ieee;
 
 import com.fossgalaxy.games.fireworks.ai.AgentPlayer;
 import com.fossgalaxy.games.fireworks.players.Player;
+import com.fossgalaxy.games.fireworks.state.CardColour;
 import com.fossgalaxy.games.fireworks.state.GameState;
 import com.fossgalaxy.games.fireworks.state.actions.Action;
 import com.fossgalaxy.games.fireworks.state.actions.DiscardCard;
 import com.fossgalaxy.games.fireworks.state.actions.PlayCard;
 import com.fossgalaxy.games.fireworks.state.actions.TellColour;
 import com.fossgalaxy.games.fireworks.state.actions.TellValue;
+import com.fossgalaxy.games.fireworks.state.events.CardDiscarded;
 import com.fossgalaxy.games.fireworks.state.events.CardDrawn;
 import com.fossgalaxy.games.fireworks.state.events.CardInfoColour;
 import com.fossgalaxy.games.fireworks.state.events.CardInfoValue;
+import com.fossgalaxy.games.fireworks.state.events.CardPlayed;
 import com.fossgalaxy.games.fireworks.state.events.CardReceived;
 import com.fossgalaxy.games.fireworks.state.events.GameEvent;
 import com.fossgalaxy.games.fireworks.state.events.GameInformation;
@@ -19,6 +22,8 @@ import net.rmelick.hanabi.bot.live.connector.schemas.java.Clue;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.ClueType;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Init;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Notify;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Type;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Which;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,22 +70,28 @@ public class LiveGameRunner {
                 _gameState.getLives());
         List<GameEvent> gameEvents = new ArrayList<>();
         gameEvents.add(gameInfo);
-        for (Notify notify: initials) {
-            gameEvents.addAll(convertInitialEvent(notify));
+        for (int eventIndex = 0; eventIndex < initials.size(); eventIndex++) {
+            Notify initial = initials.get(eventIndex);
+            Notify previous = eventIndex > 0 ? initials.get(eventIndex - 1) : null;
+            gameEvents.addAll(convertInitialEvent(initial, previous));
         }
         // constants taken from com.fossgalaxy.games.fireworks.GameRunner.init
         _myPlayer.resolveTurn(-2, null, gameEvents);
     }
 
-    public List<GameEvent> convertInitialEvent(Notify event) {
+    private List<GameEvent> convertInitialEvent(Notify event, Notify previous) {
         switch (event.getType()) {
-            case "draw":
+            case DRAW:
                 return convertInitialDraw(event);
-            case "clue":
+            case CLUE:
                 return convertInitialClue(event);
-            case "status":
-            case "text":
-            case "turn": // not sure about this, we may want it
+            case STRIKE:
+                return convertInitialStrike(event);
+            case DISCARD:
+                return convertInitialDiscard(event, previous);
+            case STATUS:
+            case TEXT:
+            case TURN: // not sure about this, we may want it
                 return Collections.emptyList(); // don't care
             default:
                 throw new IllegalArgumentException("Unknown initial event " + event.getType());
@@ -109,35 +120,89 @@ public class LiveGameRunner {
 
     private List<GameEvent> convertInitialClue(Notify event) {
         Clue clue = event.getClue();
-        ClueType type = ClueType.valueOfHanabiID((int) clue.getType())
+        ClueType type = ClueType.valueOfHanabiID((int) clue.getType());
+        int clueGiver = event.getGiver().intValue();
+        int clueTarget = event.getTarget().intValue();
+        HandMapping targetPlayerHand = _playerHands.get(clueTarget);
         switch (type) {
             case RANK:
                 CardInfoValue rankInfo = new CardInfoValue(
-                        event.getWho().intValue(),
-                        event.getTarget().intValue(),
+                        clueGiver,
+                        clueTarget,
                         (int) event.getClue().getValue(),
-                        _playerHands.get(event.getWho().intValue()).findSlotsOfHanabi(event.getList()),
+                        targetPlayerHand.findSlotsOfHanabi(event.getList()),
                         event.getTurn().intValue()
                 );
                 return Collections.singletonList(rankInfo);
             case COLOR:
                 CardInfoColour colorInfo = new CardInfoColour(
-                        event.getWho().intValue(),
-                        event.getTarget().intValue(),
+                        clueGiver,
+                        clueTarget,
                         CardColors.getFromLiveId(clue.getValue()),
-                        _playerHands.get(event.getWho().intValue()).findSlotsOfHanabi(event.getList()),
+                        targetPlayerHand.findSlotsOfHanabi(event.getList()),
                         event.getTurn().intValue()
                 );
                 return Collections.singletonList(colorInfo);
             default:
                 throw new IllegalArgumentException("Unknown clue type " + type);
         }
+    }
 
+    private List<GameEvent> convertInitialStrike(Notify event) {
+        // we wait for the following discard event and handle both
+        return Collections.emptyList();
+    }
+
+    /**
+     * type Which struct { // Used by "ActionPlay" and "ActionDiscard"
+     * 	Index int `json:"index"` // The index of the player
+     * 	Suit  int `json:"suit"`
+     * 	Rank  int `json:"rank"`
+     * 	Order int `json:"order"` // The ID of the card (based on its order in the deck)
+     * }
+     * @param event
+     * @param previous
+     * @return
+     */
+    private List<GameEvent> convertInitialDiscard(Notify event, Notify previous) {
+        Which which = event.getWhich();
+        int playerIndex = (int) which.getIndex();
+        HandMapping playerHand = _playerHands.get(playerIndex);
+        int discardedSlot = playerHand.findSlotOfHanabi(which.getOrder());
+        CardColour discardedCardColor = CardColors.getFromLiveId(which.getSuit());
+        int discardCardRank = (int) which.getRank();
+
+        playerHand.recordHanabiDiscard((int) which.getOrder());
+
+        if (event.getFailed() && previous != null && Type.STRIKE == previous.getType()) {
+            // failed discards are from a misplay
+            // for IEEE, we convert it back to a CardPlayed and let the local state handle the failure
+            CardPlayed play = new CardPlayed(
+                    playerIndex,
+                    discardedSlot,
+                    discardedCardColor,
+                    discardCardRank,
+                    previous.getTurn().intValue()
+            );
+            return Collections.singletonList(play);
+        } else if (previous != null && Type.TURN == previous.getType()) {
+            // just a plain discard
+            CardDiscarded play = new CardDiscarded(
+                    playerIndex,
+                    discardedSlot,
+                    discardedCardColor,
+                    discardCardRank,
+                    previous.getNum().intValue()
+            );
+            return Collections.singletonList(play);
+        } else {
+            throw new IllegalStateException("Invalid sequence, couldn't find previous turn info for discard");
+        }
     }
 
     private Action convertClue(Notify event) {
         Clue clue = event.getClue();
-        ClueType type = ClueType.valueOfHanabiID((int) clue.getType())
+        ClueType type = ClueType.valueOfHanabiID((int) clue.getType());
         switch (type) {
             case RANK:
                 return new TellValue(event.getTarget().intValue(), (int) clue.getValue());
@@ -168,21 +233,38 @@ public class LiveGameRunner {
         net.rmelick.hanabi.bot.live.connector.schemas.java.Action liveAction = new net.rmelick.hanabi.bot.live.connector.schemas.java.Action();
         if (action instanceof DiscardCard) {
             DiscardCard discard = (DiscardCard) action;
+            liveAction.setType(ActionType.DISCARD.getHanabiLiveID());
+
             int hanabiIDToDiscard = _playerHands.get(_myHanabiLivePlayerID).getHanabiInSlot(discard.slot);
             liveAction.setTarget(hanabiIDToDiscard);
-            liveAction.setType(ActionType.DISCARD.getHanabiLiveID());
         } else if (action instanceof PlayCard) {
             PlayCard play = (PlayCard) action;
+            liveAction.setType(ActionType.PLAY.getHanabiLiveID());
+
             int hanabiIDToPlay = _playerHands.get(_myHanabiLivePlayerID).getHanabiInSlot(play.slot);
             liveAction.setTarget(hanabiIDToPlay);
-            liveAction.setType(ActionType.PLAY.getHanabiLiveID());
         } else if (action instanceof TellValue) {
+            TellValue tellValue = (TellValue) action;
+            liveAction.setType(ActionType.CLUE.getHanabiLiveID());
 
+            liveAction.setTarget(tellValue.player);
+            Clue clue = new Clue();
+            clue.setType(ClueType.RANK.getHanabiLiveID());
+            clue.setValue(tellValue.value);
+            liveAction.setClue(clue);
         } else if (action instanceof TellColour) {
+            TellColour tellColor = (TellColour) action;
+            liveAction.setType(ActionType.CLUE.getHanabiLiveID());
 
+            liveAction.setTarget(tellColor.player);
+            Clue clue = new Clue();
+            clue.setType(ClueType.COLOR.getHanabiLiveID());
+            clue.setValue(CardColors.getLiveId(tellColor.colour));
+            liveAction.setClue(clue);
         } else {
             throw new IllegalArgumentException("Unknown action " + action);
         }
+        return liveAction;
     }
 
 }

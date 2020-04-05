@@ -2,15 +2,15 @@
   {
     "type": "draw",
     "who": 0,
-    "rank": 5,
-    "suit": 4,
+    "rank": 3,
+    "suit": 1,
     "order": 0
   },
   {
     "type": "draw",
     "who": 0,
-    "rank": 3,
-    "suit": 1,
+    "rank": 1,
+    "suit": 4,
     "order": 1
   },
   {
@@ -23,50 +23,50 @@
   {
     "type": "draw",
     "who": 0,
-    "rank": 2,
-    "suit": 4,
+    "rank": 4,
+    "suit": 0,
     "order": 3
   },
   {
     "type": "draw",
     "who": 0,
-    "rank": 1,
-    "suit": 4,
+    "rank": 3,
+    "suit": 2,
     "order": 4
   },
   {
     "type": "draw",
     "who": 1,
-    "rank": -1,
-    "suit": -1,
+    "rank": 2,
+    "suit": 4,
     "order": 5
   },
   {
     "type": "draw",
     "who": 1,
-    "rank": -1,
-    "suit": -1,
+    "rank": 3,
+    "suit": 0,
     "order": 6
   },
   {
     "type": "draw",
     "who": 1,
-    "rank": -1,
-    "suit": -1,
+    "rank": 2,
+    "suit": 3,
     "order": 7
   },
   {
     "type": "draw",
     "who": 1,
-    "rank": -1,
-    "suit": -1,
+    "rank": 2,
+    "suit": 1,
     "order": 8
   },
   {
     "type": "draw",
     "who": 1,
-    "rank": -1,
-    "suit": -1,
+    "rank": 2,
+    "suit": 4,
     "order": 9
   },
   {
@@ -78,7 +78,7 @@
   },
   {
     "type": "text",
-    "text": "rolls-brave goes first"
+    "text": "rolls-safari goes first"
   },
   {
     "type": "turn",
@@ -86,28 +86,38 @@
     "who": 0
   },
   {
-    "type": "clue",
-    "clue": {
-      "type": 0,
-      "value": 1
-    },
-    "giver": 0,
-    "list": [
-      6
-    ],
-    "target": 1,
-    "turn": 0
+    "type": "strike",
+    "num": 1,
+    "turn": 0,
+    "order": 4
+  },
+  {
+    "type": "discard",
+    "failed": true,
+    "which": {
+      "index": 0,
+      "suit": 2,
+      "rank": 3,
+      "order": 4
+    }
   },
   {
     "type": "text",
-    "text": "rolls-brave tells rolls-bot-g0 about one 1"
+    "text": "rolls-safari fails to play Green 3 from slot #1 (blind)"
+  },
+  {
+    "type": "draw",
+    "who": 0,
+    "rank": 4,
+    "suit": 0,
+    "order": 10
   },
   {
     "type": "status",
-    "clues": 7,
+    "clues": 8,
     "score": 0,
     "maxScore": 25,
-    "doubleDiscard": false
+    "doubleDiscard": true
   },
   {
     "type": "turn",
@@ -115,62 +125,1007 @@
     "who": 1
   },
   {
-    "type": "clue",
-    "clue": {
-      "type": 0,
-      "value": 1
-    },
-    "giver": 0,
-    "list": [
-      6,
-      7
-    ],
-    "target": 1,
-    "turn": 0
+    "type": "strike",
+    "num": 2,
+    "turn": 1,
+    "order": 9
+  },
+  {
+    "type": "discard",
+    "failed": true,
+    "which": {
+      "index": 1,
+      "suit": 4,
+      "rank": 2,
+      "order": 9
+    }
   },
   {
     "type": "text",
-    "text": "rolls-brave tells rolls-chrome about two 1s"
+    "text": "rolls-brave fails to play Purple 2 from slot #1 (blind)"
+  },
+  {
+    "type": "draw",
+    "who": 1,
+    "rank": 3,
+    "suit": 1,
+    "order": 11
   },
   {
     "type": "status",
-    "clues": 7,
+    "clues": 8,
     "score": 0,
+    "maxScore": 25,
+    "doubleDiscard": true
+  },
+  {
+    "type": "turn",
+    "num": 2,
+    "who": 0
+  },
+  {
+    "type": "play",
+    "which": {
+      "index": 0,
+      "suit": 0,
+      "rank": 1,
+      "order": 2
+    }
+  },
+  {
+    "type": "text",
+    "text": "rolls-safari plays Red 1 from slot #3 (blind)"
+  },
+  {
+    "type": "draw",
+    "who": 0,
+    "rank": 4,
+    "suit": 4,
+    "order": 12
+  },
+  {
+    "type": "status",
+    "clues": 8,
+    "score": 1,
     "maxScore": 25,
     "doubleDiscard": false
   },
   {
     "type": "turn",
-    "num": 1,
+    "num": 3,
     "who": 1
   },
   {
     "type": "clue",
     "clue": {
       "type": 0,
-      "value": 1
+      "value": 4
     },
-    "giver": 0,
+    "giver": 1,
     "list": [
-      6
+      3,
+      10,
+      12
     ],
-    "target": 1,
-    "turn": 0
+    "target": 0,
+    "turn": 3
   },
   {
     "type": "text",
-    "text": "rolls-brave tells rolls-bot-g0 about one 1"
+    "text": "rolls-brave tells rolls-safari about three 4s"
   },
   {
     "type": "status",
     "clues": 7,
-    "score": 0,
+    "score": 1,
     "maxScore": 25,
     "doubleDiscard": false
   },
   {
     "type": "turn",
-    "num": 1,
+    "num": 4,
+    "who": 0
+  },
+  {
+    "type": "clue",
+    "clue": {
+      "type": 0,
+      "value": 2
+    },
+    "giver": 0,
+    "list": [
+      5,
+      7,
+      8
+    ],
+    "target": 1,
+    "turn": 4
+  },
+  {
+    "type": "text",
+    "text": "rolls-safari tells rolls-brave about three 2s"
+  },
+  {
+    "type": "status",
+    "clues": 6,
+    "score": 1,
+    "maxScore": 25,
+    "doubleDiscard": false
+  },
+  {
+    "type": "turn",
+    "num": 5,
     "who": 1
-  }
+  },
+  {
+    "type": "discard",
+    "failed": false,
+    "which": {
+      "index": 1,
+      "suit": 0,
+      "rank": 3,
+      "order": 6
+    }
+  },
+  {
+    "type": "text",
+    "text": "rolls-brave discards Red 3 from slot #4"
+  },
+  {
+    "type": "draw",
+    "who": 1,
+    "rank": 1,
+    "suit": 3,
+    "order": 13
+  },
+  {
+    "type": "status",
+    "clues": 7,
+    "score": 1,
+    "maxScore": 25,
+    "doubleDiscard": true
+  },
+  {
+    "type": "turn",
+    "num": 6,
+    "who": 0
+  },
+  {
+    "type": "clue",
+    "clue": {
+      "type": 0,
+      "value": 2
+    },
+    "giver": 0,
+    "list": [
+      5,
+      7,
+      8
+    ],
+    "target": 1,
+    "turn": 6
+  },
+  {
+    "type": "text",
+    "text": "rolls-safari tells rolls-brave about three 2s"
+  },
+  {
+    "type": "status",
+    "clues": 6,
+    "score": 1,
+    "maxScore": 25,
+    "doubleDiscard": false
+  },
+  {
+    "type": "turn",
+    "num": 7,
+    "who": 1
+  },
+  {
+    "type": "clue",
+    "clue": {
+      "type": 0,
+      "value": 4
+    },
+    "giver": 1,
+    "list": [
+      3,
+      10,
+      12
+    ],
+    "target": 0,
+    "turn": 7
+  },
+  {
+    "type": "text",
+    "text": "rolls-brave tells rolls-safari about three 4s"
+  },
+  {
+    "type": "status",
+    "clues": 5,
+    "score": 1,
+    "maxScore": 25,
+    "doubleDiscard": false
+  },
+  {
+    "type": "turn",
+    "num": 8,
+    "who": 0
+  },
+  {
+    "type": "play",
+    "which": {
+      "index": 0,
+      "suit": 4,
+      "rank": 1,
+      "order": 1
+    }
+  },
+  {
+    "type": "text",
+    "text": "rolls-safari plays Purple 1 from slot #4 (blind)"
+  },
+  {
+    "type": "draw",
+    "who": 0,
+    "rank": 3,
+    "suit": 0,
+    "order": 14
+  },
+  {
+    "type": "status",
+    "clues": 5,
+    "score": 2,
+    "maxScore": 25,
+    "doubleDiscard": false
+  },
+  {
+    "type": "turn",
+    "num": 9,
+    "who": 1
+  },
+  {
+    "type": "clue",
+    "clue": {
+      "type": 1,
+      "value": 0
+    },
+    "giver": 1,
+    "list": [
+      3,
+      10,
+      14
+    ],
+    "target": 0,
+    "turn": 9
+  },
+  {
+    "type": "text",
+    "text": "rolls-brave tells rolls-safari about three Reds"
+  },
+  {
+    "type": "status",
+    "clues": 4,
+    "score": 2,
+    "maxScore": 25,
+    "doubleDiscard": false
+  },
+  {
+    "type": "turn",
+    "num": 10,
+    "who": 0
+  },
+  [
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 3,
+      "suit": 1,
+      "order": 0
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 1,
+      "suit": 4,
+      "order": 1
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 1,
+      "suit": 0,
+      "order": 2
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 4,
+      "suit": 0,
+      "order": 3
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 3,
+      "suit": 2,
+      "order": 4
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 2,
+      "suit": 4,
+      "order": 5
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 3,
+      "suit": 0,
+      "order": 6
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 2,
+      "suit": 3,
+      "order": 7
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 2,
+      "suit": 1,
+      "order": 8
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 2,
+      "suit": 4,
+      "order": 9
+    },
+    {
+      "type": "status",
+      "clues": 8,
+      "score": 0,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari goes first"
+    },
+    {
+      "type": "turn",
+      "num": 0,
+      "who": 0
+    },
+    {
+      "type": "strike",
+      "num": 1,
+      "turn": 0,
+      "order": 4
+    },
+    {
+      "type": "discard",
+      "failed": true,
+      "which": {
+        "index": 0,
+        "suit": 2,
+        "rank": 3,
+        "order": 4
+      }
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari fails to play Green 3 from slot #1 (blind)"
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 4,
+      "suit": 0,
+      "order": 10
+    },
+    {
+      "type": "status",
+      "clues": 8,
+      "score": 0,
+      "maxScore": 25,
+      "doubleDiscard": true
+    },
+    {
+      "type": "turn",
+      "num": 1,
+      "who": 1
+    },
+    {
+      "type": "strike",
+      "num": 2,
+      "turn": 1,
+      "order": 9
+    },
+    {
+      "type": "discard",
+      "failed": true,
+      "which": {
+        "index": 1,
+        "suit": 4,
+        "rank": 2,
+        "order": 9
+      }
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave fails to play Purple 2 from slot #1 (blind)"
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 3,
+      "suit": 1,
+      "order": 11
+    },
+    {
+      "type": "status",
+      "clues": 8,
+      "score": 0,
+      "maxScore": 25,
+      "doubleDiscard": true
+    },
+    {
+      "type": "turn",
+      "num": 2,
+      "who": 0
+    },
+    {
+      "type": "play",
+      "which": {
+        "index": 0,
+        "suit": 0,
+        "rank": 1,
+        "order": 2
+      }
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari plays Red 1 from slot #3 (blind)"
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 4,
+      "suit": 4,
+      "order": 12
+    },
+    {
+      "type": "status",
+      "clues": 8,
+      "score": 1,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 3,
+      "who": 1
+    },
+    {
+      "type": "clue",
+      "clue": {
+        "type": 0,
+        "value": 4
+      },
+      "giver": 1,
+      "list": [
+        3,
+        10,
+        12
+      ],
+      "target": 0,
+      "turn": 3
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave tells rolls-safari about three 4s"
+    },
+    {
+      "type": "status",
+      "clues": 7,
+      "score": 1,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 4,
+      "who": 0
+    },
+    {
+      "type": "clue",
+      "clue": {
+        "type": 0,
+        "value": 2
+      },
+      "giver": 0,
+      "list": [
+        5,
+        7,
+        8
+      ],
+      "target": 1,
+      "turn": 4
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari tells rolls-brave about three 2s"
+    },
+    {
+      "type": "status",
+      "clues": 6,
+      "score": 1,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 5,
+      "who": 1
+    },
+    {
+      "type": "discard",
+      "failed": false,
+      "which": {
+        "index": 1,
+        "suit": 0,
+        "rank": 3,
+        "order": 6
+      }
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave discards Red 3 from slot #4"
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 1,
+      "suit": 3,
+      "order": 13
+    },
+    {
+      "type": "status",
+      "clues": 7,
+      "score": 1,
+      "maxScore": 25,
+      "doubleDiscard": true
+    },
+    {
+      "type": "turn",
+      "num": 6,
+      "who": 0
+    },
+    {
+      "type": "clue",
+      "clue": {
+        "type": 0,
+        "value": 2
+      },
+      "giver": 0,
+      "list": [
+        5,
+        7,
+        8
+      ],
+      "target": 1,
+      "turn": 6
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari tells rolls-brave about three 2s"
+    },
+    {
+      "type": "status",
+      "clues": 6,
+      "score": 1,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 7,
+      "who": 1
+    },
+    {
+      "type": "clue",
+      "clue": {
+        "type": 0,
+        "value": 4
+      },
+      "giver": 1,
+      "list": [
+        3,
+        10,
+        12
+      ],
+      "target": 0,
+      "turn": 7
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave tells rolls-safari about three 4s"
+    },
+    {
+      "type": "status",
+      "clues": 5,
+      "score": 1,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 8,
+      "who": 0
+    },
+    {
+      "type": "play",
+      "which": {
+        "index": 0,
+        "suit": 4,
+        "rank": 1,
+        "order": 1
+      }
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari plays Purple 1 from slot #4 (blind)"
+    },
+    {
+      "type": "draw",
+      "who": 0,
+      "rank": 3,
+      "suit": 0,
+      "order": 14
+    },
+    {
+      "type": "status",
+      "clues": 5,
+      "score": 2,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 9,
+      "who": 1
+    },
+    {
+      "type": "clue",
+      "clue": {
+        "type": 1,
+        "value": 0
+      },
+      "giver": 1,
+      "list": [
+        3,
+        10,
+        14
+      ],
+      "target": 0,
+      "turn": 9
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave tells rolls-safari about three Reds"
+    },
+    {
+      "type": "status",
+      "clues": 4,
+      "score": 2,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 10,
+      "who": 0
+    },
+    {
+      "type": "clue",
+      "clue": {
+        "type": 1,
+        "value": 1
+      },
+      "giver": 0,
+      "list": [
+        8,
+        11
+      ],
+      "target": 1,
+      "turn": 10
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari tells rolls-brave about two Yellows"
+    },
+    {
+      "type": "status",
+      "clues": 3,
+      "score": 2,
+      "maxScore": 25,
+      "doubleDiscard": false
+    },
+    {
+      "type": "turn",
+      "num": 11,
+      "who": 1
+    },
+    {
+      "type": "strike",
+      "num": 3,
+      "turn": 11,
+      "order": 8
+    },
+    {
+      "type": "discard",
+      "failed": true,
+      "which": {
+        "index": 1,
+        "suit": 1,
+        "rank": 2,
+        "order": 8
+      }
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave fails to play Yellow 2 from slot #3"
+    },
+    {
+      "type": "draw",
+      "who": 1,
+      "rank": 1,
+      "suit": 2,
+      "order": 15
+    },
+    {
+      "type": "status",
+      "clues": 3,
+      "score": 2,
+      "maxScore": 25,
+      "doubleDiscard": true
+    },
+    {
+      "type": "text",
+      "text": "Players lose!"
+    },
+    {
+      "type": "turn",
+      "num": 12,
+      "who": -1
+    },
+    {
+      "type": "deckOrder",
+      "deck": [
+        {
+          "suit": 1,
+          "rank": 3
+        },
+        {
+          "suit": 4,
+          "rank": 1
+        },
+        {
+          "suit": 0,
+          "rank": 1
+        },
+        {
+          "suit": 0,
+          "rank": 4
+        },
+        {
+          "suit": 2,
+          "rank": 3
+        },
+        {
+          "suit": 4,
+          "rank": 2
+        },
+        {
+          "suit": 0,
+          "rank": 3
+        },
+        {
+          "suit": 3,
+          "rank": 2
+        },
+        {
+          "suit": 1,
+          "rank": 2
+        },
+        {
+          "suit": 4,
+          "rank": 2
+        },
+        {
+          "suit": 0,
+          "rank": 4
+        },
+        {
+          "suit": 1,
+          "rank": 3
+        },
+        {
+          "suit": 4,
+          "rank": 4
+        },
+        {
+          "suit": 3,
+          "rank": 1
+        },
+        {
+          "suit": 0,
+          "rank": 3
+        },
+        {
+          "suit": 2,
+          "rank": 1
+        },
+        {
+          "suit": 0,
+          "rank": 1
+        },
+        {
+          "suit": 4,
+          "rank": 4
+        },
+        {
+          "suit": 1,
+          "rank": 1
+        },
+        {
+          "suit": 2,
+          "rank": 1
+        },
+        {
+          "suit": 2,
+          "rank": 5
+        },
+        {
+          "suit": 4,
+          "rank": 1
+        },
+        {
+          "suit": 3,
+          "rank": 1
+        },
+        {
+          "suit": 1,
+          "rank": 2
+        },
+        {
+          "suit": 4,
+          "rank": 5
+        },
+        {
+          "suit": 4,
+          "rank": 3
+        },
+        {
+          "suit": 3,
+          "rank": 1
+        },
+        {
+          "suit": 0,
+          "rank": 2
+        },
+        {
+          "suit": 3,
+          "rank": 4
+        },
+        {
+          "suit": 0,
+          "rank": 5
+        },
+        {
+          "suit": 2,
+          "rank": 4
+        },
+        {
+          "suit": 2,
+          "rank": 3
+        },
+        {
+          "suit": 2,
+          "rank": 4
+        },
+        {
+          "suit": 4,
+          "rank": 3
+        },
+        {
+          "suit": 3,
+          "rank": 5
+        },
+        {
+          "suit": 0,
+          "rank": 2
+        },
+        {
+          "suit": 3,
+          "rank": 3
+        },
+        {
+          "suit": 2,
+          "rank": 1
+        },
+        {
+          "suit": 4,
+          "rank": 1
+        },
+        {
+          "suit": 1,
+          "rank": 1
+        },
+        {
+          "suit": 3,
+          "rank": 2
+        },
+        {
+          "suit": 1,
+          "rank": 5
+        },
+        {
+          "suit": 1,
+          "rank": 4
+        },
+        {
+          "suit": 2,
+          "rank": 2
+        },
+        {
+          "suit": 3,
+          "rank": 4
+        },
+        {
+          "suit": 2,
+          "rank": 2
+        },
+        {
+          "suit": 1,
+          "rank": 4
+        },
+        {
+          "suit": 1,
+          "rank": 1
+        },
+        {
+          "suit": 3,
+          "rank": 3
+        },
+        {
+          "suit": 0,
+          "rank": 1
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "text": "rolls-safari took: 46:01"
+    },
+    {
+      "type": "text",
+      "text": "rolls-brave took: 19:59"
+    },
+    {
+      "type": "text",
+      "text": "The total game duration was: 66:01"
+    },
+    {
+      "type": "turn",
+      "num": 13,
+      "who": -1
+    }
+  ]
 ]

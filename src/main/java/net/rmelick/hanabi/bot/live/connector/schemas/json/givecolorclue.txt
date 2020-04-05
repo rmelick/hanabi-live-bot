@@ -1,0 +1,10 @@
+// from the clue givers perspective
+action {"type":0,"target":0,"clue":{"type":1,"value":0}}	56
+11:29:14.231
+notify {"type":"clue","clue":{"type":1,"value":0},"giver":1,"list":[3,10,14],"target":0,"turn":9}	97
+11:29:14.284
+notify {"type":"text","text":"rolls-brave tells rolls-safari about three Reds"}	79
+11:29:14.321
+notify {"type":"status","clues":4,"score":2,"maxScore":25,"doubleDiscard":false}	80
+11:29:14.327
+notify {"type":"turn","num":10,"who":0}

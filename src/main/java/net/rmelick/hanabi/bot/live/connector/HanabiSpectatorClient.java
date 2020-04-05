@@ -78,10 +78,12 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
      */
     private boolean handleNotify(Notify notify) {
         switch (notify.getType()) {
-            case "clue":
+            case CLUE:
                 return _liveGameRunner.recordClue(notify);
-            case "text":
-            case "status":
+            case TURN:
+                return true; // the PlayerClient handles notification that it is it's turn
+            case TEXT:
+            case STATUS:
                 return true; // don't care about display stuff
             default:
                 return false;
@@ -131,6 +133,9 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     }
 
     private boolean handleTableStart(TableStart tableStart) {
+        if (tableStart.getReplay()) {
+            return true;
+        }
         Hello hello = new Hello();
         String socketMessage = "hello {}";
         LOG.info(String.format("Sending socket message %s", socketMessage));

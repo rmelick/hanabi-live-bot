@@ -18,4 +18,13 @@ public class CardColors {
     public static CardColour getFromLiveId(Long suitID) {
         return MAP.get(DEFAULT_VARIANT[suitID.intValue()]);
     }
+
+    public static int getLiveId(CardColour color) {
+        for (int liveId = 0; liveId < DEFAULT_VARIANT.length; liveId++) {
+            if (color.equals(getFromLiveId((long) liveId))) {
+                return liveId;
+            }
+        }
+        throw new IllegalArgumentException("Could not find color " + color);
+    }
 }
