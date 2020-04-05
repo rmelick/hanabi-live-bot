@@ -100,4 +100,8 @@ public class AbstractHanabiClient {
     WebSocket getWebSocket() {
         return _webSocket;
     }
+
+    public String getUsername() {
+        return _username;
+    }
 }

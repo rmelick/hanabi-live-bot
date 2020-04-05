@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -18,7 +17,6 @@ import java.util.logging.Logger;
  */
 public class HanabiSpectatorClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiSpectatorClient.class.getName());
-    private static final AtomicInteger BOT_COUNTER = new AtomicInteger(0);
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
     private MyGameState _myGameState = new MyGameState();
@@ -26,8 +24,8 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     private final Long _gameID;
     private final LiveGameRunner _liveGameRunner;
 
-    public HanabiSpectatorClient(Long gameID, LiveGameRunner liveGameRunner) {
-        super("rolls-obs-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
+    public HanabiSpectatorClient(String username, String userPassword, Long gameID, LiveGameRunner liveGameRunner) {
+        super(username, userPassword);
         _gameID = gameID;
         _liveGameRunner = liveGameRunner;
     }
@@ -70,11 +68,19 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     /**
      * Updates have happened
-     * @param readValue
+     * @param notify
      * @return
      */
-    private boolean handleNotify(Notify readValue) {
-        return false;
+    private boolean handleNotify(Notify notify) {
+        switch (notify.getType()) {
+            case "clue":
+                return _liveGameRunner.recordClue(notify);
+            case "text":
+            case "status":
+                return true; // don't care about display stuff
+            default:
+                return false;
+        }
     }
 
     private boolean handleNotifyList(List<Notify> notifies) {

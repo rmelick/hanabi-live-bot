@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -17,16 +16,16 @@ import java.util.logging.Logger;
  */
 public class HanabiPlayerClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiPlayerClient.class.getName());
-    private static final AtomicInteger BOT_COUNTER = new AtomicInteger(0);
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
     private MyGameState _myGameState = new MyGameState();
     private final Long _gameID;
     private final String _gamePassword;
     private final LiveGameRunner _liveGameRunner;
+    private Integer _myPositionInGame;
 
-    public HanabiPlayerClient(Long gameID, String gamePassword, LiveGameRunner liveGameRunner) {
-        super("rolls-bot-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
+    public HanabiPlayerClient(String username, String userPassword, Long gameID, String gamePassword, LiveGameRunner liveGameRunner) {
+        super(username, userPassword);
         _gameID = gameID;
         _gamePassword = gamePassword;
         _liveGameRunner = liveGameRunner;
@@ -59,6 +58,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
             case "chat":
             case "tableGone":
             case "tableList":
+            case "sound":
                 // ignore for now, it's super spammy
                 return true;
             default:
@@ -69,11 +69,19 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
 
     /**
      * Updates have happened
-     * @param readValue
+     * @param notify
      * @return
      */
-    private boolean handleNotify(Notify readValue) {
-        return true;
+    private boolean handleNotify(Notify notify) {
+        switch (notify.getType()) {
+            case "turn":
+                return handleNotifyTurn(notify);
+            case "text":
+            case "status":
+                return true; // don't care about display stuff
+            default:
+                return false;
+        }
     }
 
     /**
@@ -81,6 +89,8 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
      * @return
      */
     private boolean handleAction() {
+        LOG.info("Received a message saying it's my turn, but that should already be covered by the notify 'turn' message");
+        //return takeTurn();
         return true;
     }
 
@@ -92,6 +102,7 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
      * @return
      */
     private boolean handleInit(Init init) {
+        _myPositionInGame = init.getNames().indexOf(getUsername());
         Ready ready = new Ready();
         String socketMessage = CommandParser.serialize("ready", ready);
         LOG.info(String.format("Sending socket message %s", socketMessage));
@@ -123,12 +134,28 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         for (Notify notify : notifies) {
             if (notify.getType().equals("turn")) {
                 LOG.info(String.format("Most recent turn is %s waiting for player %s", notify.getNum(), notify.getWho()));
-
+                return handleNotifyTurn(notify);
             }
         }
         return true;
     }
 
+    private boolean handleNotifyTurn(Notify notify) {
+        if (_myPositionInGame == null) {
+            throw new IllegalStateException("Received turn notification but don't know my own position");
+        }
+        else if (_myPositionInGame == notify.getWho().intValue()) {
+            return takeTurn();
+        } else {
+            LOG.info(String.format("Got a turn notification (player %s), but not for me (me %s)", notify.getWho(), _myPositionInGame));
+            return true;
+        }
+    }
+
+    private boolean takeTurn() {
+        LOG.info("It's my turn!!!");
+        return true;
+    }
     /*
     Created or updated public/js/src/lobby/websocketInit.ts:97
      */
