@@ -2,10 +2,12 @@ package net.rmelick.hanabi.bot.live.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.rmelick.hanabi.bot.ieee.LiveGameRunner;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -20,13 +22,14 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
     private MyGameState _myGameState = new MyGameState();
+    private final AtomicBoolean _alreadySpectating = new AtomicBoolean(false);
     private final Long _gameID;
-    private Consumer<Init> _initCallback;
-    private Consumer<List<Notify>> _notifyListCallback;
+    private final LiveGameRunner _liveGameRunner;
 
-    public HanabiSpectatorClient(Long gameID) {
+    public HanabiSpectatorClient(Long gameID, LiveGameRunner liveGameRunner) {
         super("rolls-obs-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
         _gameID = gameID;
+        _liveGameRunner = liveGameRunner;
     }
 
     public void init() throws IOException, InterruptedException {
@@ -36,13 +39,15 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     @Override
     public boolean handleCommand(String command, String body) throws IOException {
-        //LOG.info(String.format("Received command %s %s", command, body));
+        LOG.info(String.format("Received command %s %s", command, body));
         super.handleCommand(command, body);
         switch (command) {
             case "table":
                 return handleTableUpdate(_objectMapper.readValue(body, Table.class));
             case "tableStart":
                 return handleTableStart(_objectMapper.readValue(body, TableStart.class));
+            case "tableList":
+                return handleTableList(_objectMapper.readValue(body, new TypeReference<List<Table>>() {}));
             case "init":
                 return handleInit(_objectMapper.readValue(body, Init.class));
             case "action":
@@ -56,7 +61,6 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
             case "userLeft":
             case "chat":
             case "tableGone":
-            case "tableList":
                 // ignore for now, it's super spammy
                 return true;
             default:
@@ -75,7 +79,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     }
 
     private boolean handleNotifyList(List<Notify> notifies) {
-        _notifyListCallback.accept(notifies);
+        _liveGameRunner.initialEvents(notifies);
         return true;
     }
 
@@ -95,7 +99,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
      * @return
      */
     private boolean handleInit(Init init) {
-        _initCallback.accept(init);
+        _liveGameRunner.init(init);
         Ready ready = new Ready();
         String socketMessage = CommandParser.serialize("ready", ready);
         LOG.info(String.format("Sending socket message %s", socketMessage));
@@ -109,6 +113,9 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     private boolean handleTableUpdate(Table table) {
         if (table.getID() == _gameID) {
             _myGameState.updateTable(table);
+            if (table.getRunning()) {
+                spectateTable(); // first time we see it's running, we join to spectate
+            }
         }
         return true;
     }
@@ -121,20 +128,28 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
         return true;
     }
 
+    /**
+     * When connecting, the table we want to spectate may already be in progress actually
+     * @param tableList
+     * @return
+     */
+    private boolean handleTableList(List<Table> tableList) {
+        for (Table table : tableList) {
+            handleTableUpdate(table);
+        }
+        return true;
+    }
+
 
     public void spectateTable() {
-        TableSpectate command = new TableSpectate();
-        command.setTableID(_gameID);
-        String socketMessage = CommandParser.serialize("tableSpectate", command);
-        LOG.info(String.format("Sending socket message %s", socketMessage));
-        getWebSocket().sendText(socketMessage, true);
-    }
-
-    public void setInitCallback(Consumer<Init> initCallback) {
-        _initCallback = initCallback;
-    }
-
-    public void setNotifyListCallback(Consumer<List<Notify>> notifyListCallback) {
-        _notifyListCallback = notifyListCallback;
+        if (_alreadySpectating.getAndSet(true)) {
+            LOG.warning("Already spectating");
+        } else {
+            TableSpectate command = new TableSpectate();
+            command.setTableID(_gameID);
+            String socketMessage = CommandParser.serialize("tableSpectate", command);
+            LOG.info(String.format("Sending socket message %s", socketMessage));
+            getWebSocket().sendText(socketMessage, true);
+        }
     }
 }

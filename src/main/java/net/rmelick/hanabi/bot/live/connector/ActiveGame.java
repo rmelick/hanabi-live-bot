@@ -11,12 +11,12 @@ public class ActiveGame {
     private final HanabiSpectatorClient _spectatorClient;
     private final LiveGameRunner _liveGameRunner;
 
-    public ActiveGame(HanabiPlayerClient playerClient, HanabiSpectatorClient spectatorClient) {
+    public ActiveGame(Long gameID, String password) {
+        _liveGameRunner = new LiveGameRunner();
+        HanabiPlayerClient playerClient = new HanabiPlayerClient(gameID, password, _liveGameRunner);
+        HanabiSpectatorClient spectatorClient = new HanabiSpectatorClient(gameID, _liveGameRunner);
         _playerClient = playerClient;
         _spectatorClient = spectatorClient;
-        _liveGameRunner = new LiveGameRunner();
-        _spectatorClient.setInitCallback(_liveGameRunner::init);
-        _spectatorClient.setNotifyListCallback(_liveGameRunner::initialEvents);
         _playerClient.setTableStartCallback(this::connectSpectatorToGame);
     }
 

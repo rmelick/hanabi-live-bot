@@ -1,6 +1,7 @@
 package net.rmelick.hanabi.bot.live.connector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.rmelick.hanabi.bot.ieee.LiveGameRunner;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.*;
 
 import java.io.IOException;
@@ -19,12 +20,13 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
     private MyGameState _myGameState = new MyGameState();
     private final Long _gameID;
     private final String _gamePassword;
-    private Consumer<TableStart> _tableStartCallback;
+    private final LiveGameRunner _liveGameRunner;
 
-    public HanabiPlayerClient(Long gameID, String gamePassword) {
+    public HanabiPlayerClient(Long gameID, String gamePassword, LiveGameRunner liveGameRunner) {
         super("rolls-bot-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
         _gameID = gameID;
         _gamePassword = gamePassword;
+        _liveGameRunner = liveGameRunner;
     }
 
     public void init() throws IOException, InterruptedException {
@@ -102,8 +104,6 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         String socketMessage = "hello {}";
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
-        // we can also tell the observer to connect
-        _tableStartCallback.accept(tableStart);
         return true;
     }
 
@@ -124,9 +124,5 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         String socketMessage = CommandParser.serialize("tableJoin", command);
         LOG.info(String.format("Sending socket message %s", socketMessage));
         getWebSocket().sendText(socketMessage, true);
-    }
-
-    public void setTableStartCallback(Consumer<TableStart> tableStartCallback) {
-        _tableStartCallback = tableStartCallback;
     }
 }

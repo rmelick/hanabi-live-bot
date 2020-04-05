@@ -15,3 +15,50 @@ notify {"type":"text","text":"rolls-safari tells rolls-chrome about one Purple"}
 notify {"type":"status","clues":6,"score":0,"maxScore":25,"doubleDiscard":false}	80
 21:17:35.846
 notify {"type":"turn","num":2,"who":0}
+
+// played
+notify {"type":"play","which":{"index":0,"suit":3,"rank":1,"order":2}}	70
+07:29:43.022
+notify {"type":"text","text":"rolls-safari plays Blue 1 from slot #3"}
+notify {"type":"draw","who":0,"rank":1,"suit":2,"order":10}	59
+07:29:43.058
+notify {"type":"status","clues":4,"score":1,"maxScore":25,"doubleDiscard":false}	80
+07:29:43.061
+notify {"type":"turn","num":5,"who":1}
+
+// discard
+notify {"type":"discard","failed":false,"which":{"index":1,"suit":2,"rank":3,"order":7}}	88
+07:32:51.496
+notify {"type":"text","text":"rolls-brave discards Green 3 from slot #3"}	73
+07:32:51.512
+notify {"type":"draw","who":1,"rank":4,"suit":2,"order":11}	59
+07:32:51.515
+notify {"type":"status","clues":5,"score":1,"maxScore":25,"doubleDiscard":true}	79
+07:32:51.519
+notify {"type":"turn","num":6,"who":0}
+
+// another play
+notify {"type":"play","which":{"index":0,"suit":2,"rank":1,"order":10}}	71
+07:34:04.737
+notify {"type":"text","text":"rolls-safari plays Green 1 from slot #1 (blind)"}	79
+07:34:04.741
+tableProgress {"id":305,"progress":8}	37
+07:34:04.745
+notify {"type":"draw","who":0,"rank":3,"suit":4,"order":12}	59
+07:34:04.746
+notify {"type":"status","clues":5,"score":2,"maxScore":25,"doubleDiscard":false}	80
+07:34:04.756
+notify {"type":"turn","num":7,"who":1}
+
+// played again, a card drawn in the first round
+notify {"type":"play","which":{"index":0,"suit":4,"rank":1,"order":1}}	70
+07:35:33.124
+notify {"type":"text","text":"rolls-safari plays Purple 1 from slot #4"}	72
+07:35:33.129
+tableProgress {"id":305,"progress":12}	38
+07:35:33.132
+notify {"type":"draw","who":0,"rank":3,"suit":3,"order":13}	59
+07:35:33.133
+notify {"type":"status","clues":4,"score":3,"maxScore":25,"doubleDiscard":false}	80
+07:35:33.137
+notify {"type":"turn","num":9,"who":1}
