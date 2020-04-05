@@ -16,6 +16,7 @@ import net.rmelick.hanabi.bot.live.connector.schemas.java.Init;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Notify;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LiveGameRunner {
@@ -52,21 +53,30 @@ public class LiveGameRunner {
         switch (event.getType()) {
             case "draw":
                 return convertInitialDraw(event);
+            case "status":
+            case "text":
+            case "turn": // not sure about this, we may want it
+                return Collections.emptyList(); // don't care
             default:
-                throw new IllegalArgumentException("Unknown initial event " + event);
+                throw new IllegalArgumentException("Unknown initial event " + event.getType());
         }
     }
 
     private List<GameEvent> convertInitialDraw(Notify event) {
+        // TODO: figure out how to integrate this into the deck instead of directly (so it takes care of removing the cards from the draw pile, etc.)
+        // that might let us avoid making these?  not sure
+        // also need to figure out how we pass other draw events into the DeckBackedByHanabi
+        int playerIndex = event.getWho().intValue();
+        int handIndex = event.getOrder().intValue() % HAND_SIZE[_numPlayers]; // the webserver orders all cards, not within the players hand
         CardDrawn cardDrawn = new CardDrawn(
-                event.getWho().intValue(),
-                event.getOrder().intValue(),
+                playerIndex,
+                handIndex,
                 CardColors.getFromLiveId(event.getSuit()),
                 event.getRank().intValue(),
                 0);
         CardReceived cardReceived = new CardReceived(
-                event.getWho().intValue(),
-                event.getOrder().intValue(),
+                playerIndex,
+                handIndex,
                 true, //TODO handle the final draw correctly saying there are no more cards left
                 0);
         return List.of(cardDrawn, cardReceived);

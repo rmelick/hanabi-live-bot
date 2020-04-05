@@ -35,6 +35,6 @@ public class WorldState {
                 return table.getID();
             }
         }
-        return null;
+        throw new IllegalArgumentException("Could not find table " + tableName);
     }
 }

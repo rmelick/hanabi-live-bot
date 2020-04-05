@@ -36,13 +36,13 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     @Override
     public boolean handleCommand(String command, String body) throws IOException {
-        LOG.info(String.format("Received command %s %s", command, body));
+        //LOG.info(String.format("Received command %s %s", command, body));
         super.handleCommand(command, body);
         switch (command) {
             case "table":
                 return handleTableUpdate(_objectMapper.readValue(body, Table.class));
             case "tableStart":
-                return false;
+                return handleTableStart(_objectMapper.readValue(body, TableStart.class));
             case "init":
                 return handleInit(_objectMapper.readValue(body, Init.class));
             case "action":
@@ -110,6 +110,14 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
         if (table.getID() == _gameID) {
             _myGameState.updateTable(table);
         }
+        return true;
+    }
+
+    private boolean handleTableStart(TableStart tableStart) {
+        Hello hello = new Hello();
+        String socketMessage = "hello {}";
+        LOG.info(String.format("Sending socket message %s", socketMessage));
+        getWebSocket().sendText(socketMessage, true);
         return true;
     }
 
