@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ActiveGamesManager {
-    private final Map<Long, HanabiGameClient> _activeGames = new ConcurrentHashMap<>();
+    private final Map<Long, HanabiPlayerClient> _activeGames = new ConcurrentHashMap<>();
 
     public void joinGame(Long gameID, String password) throws IOException, InterruptedException {
-        HanabiGameClient gameClient = new HanabiGameClient(gameID, password);
+        HanabiPlayerClient gameClient = new HanabiPlayerClient(gameID, password);
         _activeGames.put(gameID, gameClient);
         gameClient.init();
     }

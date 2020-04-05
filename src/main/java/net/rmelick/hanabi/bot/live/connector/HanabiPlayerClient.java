@@ -1,29 +1,17 @@
 package net.rmelick.hanabi.bot.live.connector;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.*;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
-import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.WebSocket;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**
  * A client that connects to a single game
  */
-public class HanabiGameClient extends AbstractHanabiClient {
-    private static final Logger LOG = Logger.getLogger(HanabiGameClient.class.getName());
+public class HanabiPlayerClient extends AbstractHanabiClient {
+    private static final Logger LOG = Logger.getLogger(HanabiPlayerClient.class.getName());
     private static final AtomicInteger BOT_COUNTER = new AtomicInteger(0);
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
@@ -31,7 +19,7 @@ public class HanabiGameClient extends AbstractHanabiClient {
     private final Long _gameID;
     private final String _gamePassword;
 
-    public HanabiGameClient(Long gameID, String gamePassword) {
+    public HanabiPlayerClient(Long gameID, String gamePassword) {
         super("rolls-bot-g" + 0, "iamabot"); //BOT_COUNTER.getAndIncrement();
         _gameID = gameID;
         _gamePassword = gamePassword;
