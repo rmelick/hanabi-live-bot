@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ class HandMapping {
      */
     private final CardAdapter[] _ieeeToHanabi;
     private final BlockingQueue<Integer> _nextDrawSpot;
+    private final CountDownLatch _drawsNeeded
 
     public HandMapping(int numCardsForHand) {
         _ieeeToHanabi = new CardAdapter[numCardsForHand];

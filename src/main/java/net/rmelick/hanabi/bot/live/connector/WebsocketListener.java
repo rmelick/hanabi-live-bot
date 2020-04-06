@@ -3,6 +3,8 @@ package net.rmelick.hanabi.bot.live.connector;
 import java.io.IOException;
 import java.net.http.WebSocket;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 class WebsocketListener implements WebSocket.Listener {
@@ -10,6 +12,7 @@ class WebsocketListener implements WebSocket.Listener {
 
     private final AbstractHanabiClient _client;
     private StringBuffer _incomingText;
+    private final ExecutorService _executor = Executors.newFixedThreadPool(5);
 
     public WebsocketListener(AbstractHanabiClient client) {
         _client = client;
@@ -26,8 +29,15 @@ class WebsocketListener implements WebSocket.Listener {
             return WebSocket.Listener.super.onText(webSocket, data, last);
         }
 
-        String fullData = _incomingText.toString();
+        final String fullData = _incomingText.toString();
         _incomingText = new StringBuffer();
+
+        _executor.submit(() -> processFullText(fullData));
+
+        return WebSocket.Listener.super.onText(webSocket, data, last);
+    }
+
+    private void processFullText(String fullData) {
         CommandParser.ParsedCommand command = CommandParser.parseCommand(fullData);
         try {
             if (command != null) {
@@ -41,8 +51,6 @@ class WebsocketListener implements WebSocket.Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return WebSocket.Listener.super.onText(webSocket, data, last);
     }
 
     @Override
