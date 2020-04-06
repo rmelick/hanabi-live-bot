@@ -261,6 +261,8 @@ public class LiveGameRunner {
         HandMapping playerHand = _playerHands.get(playerIndex);
         int playedSlot = playerHand.recordHanabiPlay((int) which.getOrder());
         PlayCard playAction = new PlayCard(playedSlot);
+        // TODO if we block during draw phase (to wait for the deal), the Observer thread is stuck waiting
+        // instead we should have multiple websocket consumer threads?  But will that mess up other ordering...
         List<GameEvent> resultingEvents = playAction.apply(playerIndex, _gameState);
         _myPlayer.resolveTurn(playerIndex, playAction, resultingEvents);
         return true;

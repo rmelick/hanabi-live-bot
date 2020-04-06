@@ -54,6 +54,7 @@ class WebsocketListener implements WebSocket.Listener {
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode,
                                       String reason) {
+        // TODO add complete client refresh if we lose the player or spectator
         LOG.info("onClose: " + statusCode + " " + reason);
         return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
     }

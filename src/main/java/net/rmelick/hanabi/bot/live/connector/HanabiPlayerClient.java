@@ -91,6 +91,8 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
             case PLAY:
             case DRAW:
                 return true; // handled by the Spectator
+            case DECK_ORDER:
+                return true; // no idea what this
             case TEXT:
             case STATUS:
                 return true; // don't care about display stuff
@@ -112,7 +114,10 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
     private boolean handleWarning(Warning warning) {
         if ("You have already joined this table.".equals(warning.getWarning())) {
             return true;
-        } else {
+        } else if (warning.getWarning().contains("has not started yet")) { // {"warning":"The game for table 1729 has not started yet."}
+            return true;
+        }
+        else {
             throw new IllegalStateException("Got warning " + warning.getWarning());
         }
     }
