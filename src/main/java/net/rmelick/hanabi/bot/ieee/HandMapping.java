@@ -1,8 +1,9 @@
 package net.rmelick.hanabi.bot.ieee;
 
-import org.apache.commons.lang3.ArrayUtils;
+import com.fossgalaxy.games.fireworks.state.Card;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -20,11 +21,11 @@ class HandMapping {
      * @param hanabiLiveOrder
      * @return
      */
-    private final Integer[] _ieeeToHanabi;
+    private final CardAdapter[] _ieeeToHanabi;
     private final BlockingQueue<Integer> _nextDrawSpot;
 
     public HandMapping(int numCardsForHand) {
-        _ieeeToHanabi = new Integer[numCardsForHand];
+        _ieeeToHanabi = new CardAdapter[numCardsForHand];
         _nextDrawSpot = new LinkedBlockingQueue<>();
         for (int i = 0; i < numCardsForHand; i++) {
             _nextDrawSpot.add(i);
@@ -32,15 +33,14 @@ class HandMapping {
         }
     }
 
-    public int recordHanabiDraw(int hanabiLiveOrder) {
+    public int recordHanabiDraw(CardAdapter card) {
         if (_nextDrawSpot.isEmpty()) {
             throw new IllegalStateException("Trying to draw, but we haven't recorded any discards or plays");
         }
         int slotTaken = _nextDrawSpot.remove();
-        _ieeeToHanabi[slotTaken] = hanabiLiveOrder;
+        _ieeeToHanabi[slotTaken] = card;
         return slotTaken;
     }
-
 
     /**
      *
@@ -48,7 +48,12 @@ class HandMapping {
      * @return the slot that hanabi card is in
      */
     public int findSlotOfHanabi(Long hanabiLiveOrder) {
-        return ArrayUtils.indexOf(_ieeeToHanabi, hanabiLiveOrder.intValue());
+        for (int slot = 0; slot < _ieeeToHanabi.length; slot++) {
+            if (_ieeeToHanabi[slot].getHanabiLiveOrder() == hanabiLiveOrder) {
+                return slot;
+            }
+        }
+        throw new IllegalStateException(String.format("Could not find hanabi card %s in hand %s", hanabiLiveOrder, Arrays.toString(_ieeeToHanabi)));
     }
 
     public List<Integer> findSlotsOfHanabi(List<Long> hanabiLiveOrders) {
@@ -56,7 +61,7 @@ class HandMapping {
     }
 
     public int getHanabiInSlot(int slot) {
-        return _ieeeToHanabi[slot];
+        return _ieeeToHanabi[slot].getHanabiLiveOrder();
     }
 
     /**
@@ -66,7 +71,7 @@ class HandMapping {
      */
     public int recordHanabiPlay(int hanabiLiveOrder) {
         int index = findSlotOfHanabi((long) hanabiLiveOrder);
-        _ieeeToHanabi[index] = -1;
+        _ieeeToHanabi[index] = null;
         _nextDrawSpot.add(index);
         return index;
     }

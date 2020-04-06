@@ -27,4 +27,17 @@ public class CardColors {
         }
         throw new IllegalArgumentException("Could not find color " + color);
     }
+
+    public static String getLiveColor(CardColour color) {
+        for (int liveId = 0; liveId < DEFAULT_VARIANT.length; liveId++) {
+            if (color.equals(getFromLiveId((long) liveId))) {
+                return DEFAULT_VARIANT[liveId];
+            }
+        }
+        throw new IllegalArgumentException("Could not find color " + color);
+    }
+
+    public static String getLiveColor(int liveID) {
+        return DEFAULT_VARIANT[liveID];
+    }
 }

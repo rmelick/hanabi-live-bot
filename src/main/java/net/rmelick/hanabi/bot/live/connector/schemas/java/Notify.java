@@ -4,6 +4,7 @@ package net.rmelick.hanabi.bot.live.connector.schemas.java;
 
 import java.util.*;
 import com.fasterxml.jackson.annotation.*;
+import net.rmelick.hanabi.bot.ieee.CardColors;
 
 public class Notify {
     private Type type;
@@ -128,9 +129,16 @@ public class Notify {
             inner +=
                     "clue=" + clue +
                     ", giver=" + giver +
+                    ", target=" + target +
                     ", list=" + list;
-        } else {
-            inner += ", who=" + who +
+        } else if (type == Type.DRAW) {
+            inner +=
+                    "who=" + who +
+                            ", suit=" + CardColors.getLiveColor(suit.intValue()) +
+                            ", rank=" + rank +
+                            ", liveId/order=" + order;
+        }else {
+            inner += "who=" + who +
                     ", order=" + order +
                     ", turn=" + turn;
         }

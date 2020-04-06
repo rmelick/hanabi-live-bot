@@ -6,8 +6,10 @@ import com.fossgalaxy.games.fireworks.state.Deck;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class DeckBackedByHanabiLive extends Deck {
+    private static final Logger LOG = Logger.getLogger(DeckBackedByHanabiLive.class.getName());
     private final BlockingQueue<Card> _cards = new LinkedBlockingQueue<>();
 
     @Override
@@ -22,15 +24,18 @@ public class DeckBackedByHanabiLive extends Deck {
 
     @Override
     public Card getTopCard() {
-        Card topFromLive = null;
         try {
-            topFromLive = _cards.poll(2, TimeUnit.MINUTES);
+            Card topFromLive = _cards.poll(2, TimeUnit.MINUTES);
+            if (topFromLive == null) {
+                LOG.warning("Timeout reached waiting for new cards from live but they never came ");
+                throw new IllegalStateException("Waited for new cards from live but they never came");
+            }
+            remove(topFromLive); // don't forget to remove from the underlying deck so the other math functions work out correctly
+            return topFromLive;
         } catch (InterruptedException e) {
             e.printStackTrace();
             throw new IllegalStateException("Waited for new cards from live but the never came", e);
         }
-        remove(topFromLive);
-        return topFromLive;
     }
 
     /**

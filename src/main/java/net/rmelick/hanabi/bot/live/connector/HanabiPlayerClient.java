@@ -12,6 +12,7 @@ import net.rmelick.hanabi.bot.live.connector.schemas.java.Table;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableJoin;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.TableStart;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Type;
+import net.rmelick.hanabi.bot.live.connector.schemas.java.Warning;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -25,7 +26,6 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiPlayerClient.class.getName());
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
-    private MyGameState _myGameState = new MyGameState();
     private final Long _gameID;
     private final String _gamePassword;
     private final LiveGameRunner _liveGameRunner;
@@ -47,8 +47,6 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
     public boolean handleCommand(String command, String body) throws IOException {
         LOG.info(String.format("Received command %s %s", command, body));
         switch (command) {
-            case "table":
-                return handleTableUpdate(_objectMapper.readValue(body, Table.class));
             case "tableStart":
                 return handleTableStart(_objectMapper.readValue(body, TableStart.class));
             case "init":
@@ -59,7 +57,10 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
                 return handleNotify(_objectMapper.readValue(body, Notify.class));
             case "notifyList":
                 return handleNotifyList(_objectMapper.readValue(body, new TypeReference<List<Notify>>() {}));
+            case "warning":
+                return handleWarning(_objectMapper.readValue(body, Warning.class));
             case "tableProgress":
+            case "table":
             case "user":
             case "userLeft":
             case "chat":
@@ -106,6 +107,14 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
         LOG.info("Received a message saying it's my turn, but that should already be covered by the notify 'turn' message");
         //return takeTurn();
         return true;
+    }
+
+    private boolean handleWarning(Warning warning) {
+        if ("You have already joined this table.".equals(warning.getWarning())) {
+            return true;
+        } else {
+            throw new IllegalStateException("Got warning " + warning.getWarning());
+        }
     }
 
     /**
@@ -177,12 +186,9 @@ public class HanabiPlayerClient extends AbstractHanabiClient {
     /*
     Created or updated public/js/src/lobby/websocketInit.ts:97
      */
-    private boolean handleTableUpdate(Table table) {
-        if (table.getID() == _gameID) {
-            _myGameState.updateTable(table);
-        }
+    /*private boolean handleTableUpdate(Table table) {
         return true;
-    }
+    }*/
 
     private void joinTable(Long tableID, String password) {
         TableJoin command = new TableJoin();

@@ -5,7 +5,6 @@ import com.fossgalaxy.games.fireworks.ai.iggi.IGGIFactory;
 import com.fossgalaxy.games.fireworks.players.Player;
 import com.fossgalaxy.games.fireworks.state.Card;
 import com.fossgalaxy.games.fireworks.state.CardColour;
-import com.fossgalaxy.games.fireworks.state.GameState;
 import com.fossgalaxy.games.fireworks.state.actions.Action;
 import com.fossgalaxy.games.fireworks.state.actions.DiscardCard;
 import com.fossgalaxy.games.fireworks.state.actions.PlayCard;
@@ -32,13 +31,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 public class LiveGameRunner {
+    private static final Logger LOG = Logger.getLogger(LiveGameRunner.class.getName());
     private static final int[] HAND_SIZE = {-1, -1, 5, 5, 4, 4};
 
     private final Player _myPlayer;
@@ -66,10 +64,8 @@ public class LiveGameRunner {
         }
 
         _gameState = new StateBackedByHanabiLive(_numPlayers);
-        _gameState.init();
 
         _myPlayer.setID(_myHanabiLivePlayerID, _numPlayers, playerNames.toArray(new String[0]));
-        _initCompleted.countDown();
     }
 
     public void initialEvents(List<Notify> initials) {
@@ -85,8 +81,12 @@ public class LiveGameRunner {
             Notify previous = eventIndex > 0 ? initials.get(eventIndex - 1) : null;
             gameEvents.addAll(convertInitialEvent(initial, previous));
         }
+
+        // wait to initialize the game state until we have made all the initial draw cards availabe
+        _gameState.init();
         // constants taken from com.fossgalaxy.games.fireworks.GameRunner.init
         _myPlayer.resolveTurn(-2, null, gameEvents);
+        _initCompleted.countDown();
     }
 
     private List<GameEvent> convertInitialEvent(Notify event, Notify previous) {
@@ -115,12 +115,17 @@ public class LiveGameRunner {
         // that might let us avoid making these?  not sure
         // also need to figure out how we pass other draw events into the DeckBackedByHanabi
         int playerIndex = event.getWho().intValue();
-        int handIndex = _playerHands.get(playerIndex).recordHanabiDraw(event.getOrder().intValue());
+        Card drawnCard = new Card(event.getRank().intValue(), CardColors.getFromLiveId(event.getSuit()));
+        int hanabiLiveOrder = event.getOrder().intValue();
+
+        int handIndex = _playerHands.get(playerIndex).recordHanabiDraw(new CardAdapter(drawnCard, hanabiLiveOrder));
+        _gameState.recordDrawFromLive(drawnCard);
+
         CardDrawn cardDrawn = new CardDrawn(
                 playerIndex,
                 handIndex,
-                CardColors.getFromLiveId(event.getSuit()),
-                event.getRank().intValue(),
+                drawnCard.colour,
+                drawnCard.value,
                 0);
         CardReceived cardReceived = new CardReceived(
                 playerIndex,
@@ -238,10 +243,11 @@ public class LiveGameRunner {
 
 
     public boolean recordPlay(Notify event) {
+        LOG.info("Recording play move");
         Which which = event.getWhich();
         int playerIndex = (int) which.getIndex();
         HandMapping playerHand = _playerHands.get(playerIndex);
-        int playedSlot = playerHand.findSlotOfHanabi(which.getOrder());
+        int playedSlot = playerHand.recordHanabiPlay((int) which.getOrder());
         PlayCard playAction = new PlayCard(playedSlot);
         List<GameEvent> resultingEvents = playAction.apply(playerIndex, _gameState);
         _myPlayer.resolveTurn(playerIndex, playAction, resultingEvents);
@@ -250,11 +256,11 @@ public class LiveGameRunner {
 
     public boolean recordDraw(Notify event) {
         int playerIndex = event.getWho().intValue();
-        int handIndex = _playerHands.get(playerIndex).recordHanabiDraw(event.getOrder().intValue());
-
         Card drawnCard = new Card(event.getRank().intValue(), CardColors.getFromLiveId(event.getSuit()));
-        _gameState.makeCardAvailableToDraw(drawnCard);
+        int hanabiLiveOrder = event.getOrder().intValue();
 
+        _playerHands.get(playerIndex).recordHanabiDraw(new CardAdapter(drawnCard, hanabiLiveOrder));
+        _gameState.recordDrawFromLive(drawnCard);
         return true;
     }
 
@@ -308,7 +314,11 @@ public class LiveGameRunner {
 
     public net.rmelick.hanabi.bot.live.connector.schemas.java.Action getNextPlayerMove() {
         try {
-            _initCompleted.await(2, TimeUnit.MINUTES);
+            boolean success = _initCompleted.await(2, TimeUnit.MINUTES);
+            if (!success && _initCompleted.getCount() > 0) {
+                LOG.warning("Waited 2 mins but table was never initialized, initing with empty");
+                initialEvents(Collections.emptyList());
+            }
         } catch (InterruptedException e) {
             throw new IllegalStateException("Timeout waiting for spectator to initialize GameRunner", e);
         }

@@ -25,7 +25,6 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiSpectatorClient.class.getName());
 
     private final ObjectMapper _objectMapper = new ObjectMapper();
-    private MyGameState _myGameState = new MyGameState();
     private final AtomicBoolean _alreadySpectating = new AtomicBoolean(false);
     private final Long _gameID;
     private final LiveGameRunner _liveGameRunner;
@@ -43,7 +42,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
 
     @Override
     public boolean handleCommand(String command, String body) throws IOException {
-        //LOG.info(String.format("Received command %s %s", command, body));
+        LOG.info(String.format("Received command %s %s", command, body));
         switch (command) {
             case "table":
                 return handleTableUpdate(_objectMapper.readValue(body, Table.class));
@@ -109,6 +108,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
     }
 
     private boolean handleNotifyList(List<Notify> notifies) {
+        LOG.info("handling notifyList");
         _liveGameRunner.initialEvents(notifies);
         return true;
     }
@@ -129,6 +129,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
      * @return
      */
     private boolean handleInit(Init init) {
+        LOG.info("handling init");
         _liveGameRunner.init(init);
         Ready ready = new Ready();
         String socketMessage = CommandParser.serialize("ready", ready);
@@ -142,7 +143,6 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
      */
     private boolean handleTableUpdate(Table table) {
         if (table.getID() == _gameID) {
-            _myGameState.updateTable(table);
             if (table.getRunning()) {
                 spectateTable(); // first time we see it's running, we join to spectate
             }
