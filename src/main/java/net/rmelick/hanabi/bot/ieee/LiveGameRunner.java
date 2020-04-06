@@ -34,10 +34,12 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class LiveGameRunner {
     private static final Logger LOG = Logger.getLogger(LiveGameRunner.class.getName());
     private static final int[] HAND_SIZE = {-1, -1, 5, 5, 4, 4};
+    public static final int SYSTEM_PLAYER_ID = -2;
 
     private final Player _myPlayer;
     private final String _myHanabiLivePlayerName;
@@ -74,22 +76,29 @@ public class LiveGameRunner {
                 HAND_SIZE[_numPlayers],
                 _gameState.getInfomation(),
                 _gameState.getLives());
-        List<GameEvent> gameEvents = new ArrayList<>();
-        gameEvents.add(gameInfo);
+        List<GameEventByPlayer> gameEventsByPlayers = new ArrayList<>();
+        gameEventsByPlayers.add(new GameEventByPlayer(gameInfo, SYSTEM_PLAYER_ID));
         for (int eventIndex = 0; eventIndex < initials.size(); eventIndex++) {
             Notify initial = initials.get(eventIndex);
             Notify previous = eventIndex > 0 ? initials.get(eventIndex - 1) : null;
-            gameEvents.addAll(convertInitialEvent(initial, previous));
+            gameEventsByPlayers.addAll(convertInitialEvent(initial, previous));
         }
 
         // wait to initialize the game state until we have made all the initial draw cards availabe
         _gameState.init();
+        // pass all the events to the global/observer gameState so it can process them
+        for (GameEventByPlayer gameEventByPlayer : gameEventsByPlayers) {
+            gameEventByPlayer.getGameEvent().apply(_gameState, gameEventByPlayer.getPlayerID());
+        }
+
+        // pass all the events to my player again, so they can update their local state
         // constants taken from com.fossgalaxy.games.fireworks.GameRunner.init
-        _myPlayer.resolveTurn(-2, null, gameEvents);
+        List<GameEvent> justEvents = gameEventsByPlayers.stream().map(GameEventByPlayer::getGameEvent).collect(Collectors.toList());
+        _myPlayer.resolveTurn(SYSTEM_PLAYER_ID, null, justEvents);
         _initCompleted.countDown();
     }
 
-    private List<GameEvent> convertInitialEvent(Notify event, Notify previous) {
+    private List<GameEventByPlayer> convertInitialEvent(Notify event, Notify previous) {
         switch (event.getType()) {
             case DRAW:
                 return convertInitialDraw(event);
@@ -110,7 +119,7 @@ public class LiveGameRunner {
         }
     }
 
-    private List<GameEvent> convertInitialDraw(Notify event) {
+    private List<GameEventByPlayer> convertInitialDraw(Notify event) {
         // TODO: figure out how to integrate this into the deck instead of directly (so it takes care of removing the cards from the draw pile, etc.)
         // that might let us avoid making these?  not sure
         // also need to figure out how we pass other draw events into the DeckBackedByHanabi
@@ -132,10 +141,13 @@ public class LiveGameRunner {
                 handIndex,
                 true, //TODO handle the final draw correctly saying there are no more cards left
                 0); // TODO handle looking for turns when importing a big game
-        return List.of(cardDrawn, cardReceived);
+        return List.of(
+                new GameEventByPlayer(cardDrawn, playerIndex),
+                new GameEventByPlayer(cardReceived, playerIndex)
+        );
     }
 
-    private List<GameEvent> convertInitialClue(Notify event) {
+    private List<GameEventByPlayer> convertInitialClue(Notify event) {
         Clue clue = event.getClue();
         ClueType type = ClueType.valueOfHanabiID((int) clue.getType());
         int clueGiver = event.getGiver().intValue();
@@ -150,7 +162,7 @@ public class LiveGameRunner {
                         targetPlayerHand.findSlotsOfHanabi(event.getList()),
                         event.getTurn().intValue()
                 );
-                return Collections.singletonList(rankInfo);
+                return Collections.singletonList(new GameEventByPlayer(rankInfo, clueGiver));
             case COLOR:
                 CardInfoColour colorInfo = new CardInfoColour(
                         clueGiver,
@@ -159,13 +171,13 @@ public class LiveGameRunner {
                         targetPlayerHand.findSlotsOfHanabi(event.getList()),
                         event.getTurn().intValue()
                 );
-                return Collections.singletonList(colorInfo);
+                return Collections.singletonList(new GameEventByPlayer(colorInfo, clueGiver));
             default:
                 throw new IllegalArgumentException("Unknown clue type " + type);
         }
     }
 
-    private List<GameEvent> convertInitialStrike(Notify event) {
+    private List<GameEventByPlayer> convertInitialStrike(Notify event) {
         // we wait for the following discard event and handle both
         return Collections.emptyList();
     }
@@ -181,7 +193,7 @@ public class LiveGameRunner {
      * @param previous
      * @return
      */
-    private List<GameEvent> convertInitialDiscard(Notify event, Notify previous) {
+    private List<GameEventByPlayer> convertInitialDiscard(Notify event, Notify previous) {
         Which which = event.getWhich();
         int playerIndex = (int) which.getIndex();
         HandMapping playerHand = _playerHands.get(playerIndex);
@@ -201,7 +213,7 @@ public class LiveGameRunner {
                     discardCardRank,
                     previous.getTurn().intValue()
             );
-            return Collections.singletonList(play);
+            return Collections.singletonList(new GameEventByPlayer(play, playerIndex));
         } else if (previous != null && Type.TURN == previous.getType()) {
             // just a plain discard
             CardDiscarded discard = new CardDiscarded(
@@ -211,13 +223,13 @@ public class LiveGameRunner {
                     discardCardRank,
                     previous.getNum().intValue()
             );
-            return Collections.singletonList(discard);
+            return Collections.singletonList(new GameEventByPlayer(discard, playerIndex));
         } else {
             throw new IllegalStateException("Invalid sequence, couldn't find previous turn info for discard");
         }
     }
 
-    private List<GameEvent> convertInitialPlay(Notify event, Notify previous) {
+    private List<GameEventByPlayer> convertInitialPlay(Notify event, Notify previous) {
         Which which = event.getWhich();
         int playerIndex = (int) which.getIndex();
         HandMapping playerHand = _playerHands.get(playerIndex);
@@ -235,7 +247,7 @@ public class LiveGameRunner {
                     playedCardRank,
                     previous.getNum().intValue()
             );
-            return Collections.singletonList(play);
+            return Collections.singletonList(new GameEventByPlayer(play, playerIndex));
         } else {
             throw new IllegalStateException("Invalid sequence, couldn't find 'turn' before 'play'");
         }
