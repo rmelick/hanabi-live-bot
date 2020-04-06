@@ -61,7 +61,11 @@ class HandMapping {
     }
 
     public int getHanabiInSlot(int slot) {
-        return _ieeeToHanabi[slot].getHanabiLiveOrder();
+        CardAdapter cardAdapter = _ieeeToHanabi[slot];
+        if (cardAdapter == null) {
+            throw new IllegalStateException("Trying to access slot before deal");
+        }
+        return cardAdapter.getHanabiLiveOrder();
     }
 
     /**
