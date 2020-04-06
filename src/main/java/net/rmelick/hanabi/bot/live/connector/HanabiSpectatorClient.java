@@ -99,6 +99,8 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
             case TURN:
                 // TODO but do we need to track it for strikes, etc.
                 return true; // the PlayerClient handles notification that it is it's turn,
+            case DECK_ORDER:
+                return true; // end of game
             case TEXT:
             case STATUS:
                 return true; // don't care about display stuff

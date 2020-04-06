@@ -52,7 +52,7 @@ public class LiveGameRunner {
 
     public LiveGameRunner(String hanabiLivePlayerName) {
         _myHanabiLivePlayerName = hanabiLivePlayerName;
-        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, IGGIFactory.buildCautious());
+        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, IGGIFactory.buildIGGI2Player());
     }
 
     public void init(Init initMessage) {

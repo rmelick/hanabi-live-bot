@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -24,7 +25,6 @@ class HandMapping {
      */
     private final CardAdapter[] _ieeeToHanabi;
     private final BlockingQueue<Integer> _nextDrawSpot;
-    private final CountDownLatch _drawsNeeded
 
     public HandMapping(int numCardsForHand) {
         _ieeeToHanabi = new CardAdapter[numCardsForHand];
@@ -36,12 +36,19 @@ class HandMapping {
     }
 
     public int recordHanabiDraw(CardAdapter card) {
-        if (_nextDrawSpot.isEmpty()) {
+        /*if (_nextDrawSpot.isEmpty()) {
             throw new IllegalStateException("Trying to draw, but we haven't recorded any discards or plays");
+        }*/
+        try {
+            Integer slotTaken = _nextDrawSpot.poll(15, TimeUnit.SECONDS);
+            if (slotTaken == null) {
+                throw new IllegalStateException("Waited for play or discard, but did not receive it");
+            }
+            _ieeeToHanabi[slotTaken] = card;
+            return slotTaken;
+        } catch (InterruptedException e) {
+            throw new IllegalStateException("Error while waiting for play/discard", e);
         }
-        int slotTaken = _nextDrawSpot.remove();
-        _ieeeToHanabi[slotTaken] = card;
-        return slotTaken;
     }
 
     /**
