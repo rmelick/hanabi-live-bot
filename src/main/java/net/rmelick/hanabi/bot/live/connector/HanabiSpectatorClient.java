@@ -104,6 +104,7 @@ public class HanabiSpectatorClient extends AbstractHanabiClient {
             case TEXT:
             case STATUS:
                 return true; // don't care about display stuff
+            //TODO GAME_OVER, shut down the active game
             default:
                 throw new IllegalArgumentException("Unknown notify");
         }

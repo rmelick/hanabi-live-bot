@@ -26,7 +26,7 @@ public class BotsList {
 
     public void init() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException {
         Class<AgentFinder> clazz = AgentFinder.class;
-        Method scanMethod = clazz.getDeclaredMethod("scanForAgents", null);
+        Method scanMethod = clazz.getDeclaredMethod("scanForAgents");
         scanMethod.setAccessible(true);
         scanMethod.invoke(_agentFinder);
         _supportedBots.addAll(filterForNoArgAgents(_agentFinder.getFactories().values()));
