@@ -35,9 +35,9 @@ jobs:
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
        version: '286.0.0'
-       service_account_email: ${{ RUN_SERVICE_ACCOUNT_EMAIL }}
-       service_account_key: ${{ RUN_SERVICE_ACCOUNT_KEY }}
-       project_id: ${{ RUN_PROJECT_ID }}
+       service_account_email: ${{ env.RUN_SERVICE_ACCOUNT_EMAIL }}
+       service_account_key: ${{ env.RUN_SERVICE_ACCOUNT_KEY }}
+       project_id: ${{ env.RUN_PROJECT_ID }}
 
     # Build and push image to Google Container Registry
     - name: Build
