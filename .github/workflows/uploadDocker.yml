@@ -6,8 +6,14 @@ name: Upload docker
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+
+env:
+  RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.RUN_SERVICE_ACCOUNT_EMAIL }}
+  RUN_SERVICE_ACCOUNT_KEY: ${{ secrets.RUN_SERVICE_ACCOUNT_KEY }}
+  RUN_PROJECT_ID: ${{ secrets.RUN_PROJECT_ID }}
+  RUN_REGION: ${{ secrets.RUN_REGION }}
+  RUN_SERVICE_NAME: ${{ secrets.RUN_SERVICE_NAME }}
+
 
 jobs:
   build:
@@ -24,11 +30,28 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Push to GitHub Packages
-      uses: docker/build-push-action@v1
+
+    # Setup gcloud CLI
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        registry: docker.pkg.github.com
-        repository: rmelick/hanabi-live-bot/image
-        tag_with_ref: true
+       version: '286.0.0'
+       service_account_email: ${{ RUN_SERVICE_ACCOUNT_EMAIL }}
+       service_account_key: ${{ RUN_SERVICE_ACCOUNT_KEY }}
+       project_id: ${{ RUN_PROJECT_ID }}
+
+    # Build and push image to Google Container Registry
+    - name: Build
+     run: |-
+       gcloud builds submit \
+         --quiet \
+         --tag "gcr.io/$RUN_PROJECT_ID/$RUN_SERVICE_NAME:$GITHUB_SHA"
+
+    # Deploy image to Cloud Run
+#    - name: Deploy
+#     run: |-
+#       gcloud run deploy "$SERVICE_NAME" \
+#         --quiet \
+#         --region "$RUN_REGION" \
+#         --image "gcr.io/$RUN_PROJECT_ID/$RUN_SERVICE_NAME:$GITHUB_SHA" \
+#         --platform "managed" \
+#         --allow-unauthenticated
