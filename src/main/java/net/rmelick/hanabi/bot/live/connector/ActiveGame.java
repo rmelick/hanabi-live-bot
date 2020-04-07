@@ -12,11 +12,11 @@ public class ActiveGame {
     private final HanabiSpectatorClient _spectatorClient;
     private final LiveGameRunner _liveGameRunner;
 
-    public ActiveGame(Long gameID, String gamePassword) {
-        int id = 0; // TODO getAndIncrement
+    public ActiveGame(Long gameID, String gamePassword, String botAgentName) {
+        int id = BOT_COUNTER.getAndIncrement(); // TODO getAndIncrement
         String clientUsername = "rolls-bot-g" + id;
         String spectatorUsername = "rolls-obs-g" + id;
-        _liveGameRunner = new LiveGameRunner(clientUsername);
+        _liveGameRunner = new LiveGameRunner(clientUsername, botAgentName);
         _playerClient = new HanabiPlayerClient(clientUsername, "iamabot", gameID, gamePassword, _liveGameRunner);
         _spectatorClient = new HanabiSpectatorClient(spectatorUsername, "iamabot", gameID, _liveGameRunner);
     }

@@ -18,6 +18,7 @@ import com.fossgalaxy.games.fireworks.state.events.CardPlayed;
 import com.fossgalaxy.games.fireworks.state.events.CardReceived;
 import com.fossgalaxy.games.fireworks.state.events.GameEvent;
 import com.fossgalaxy.games.fireworks.state.events.GameInformation;
+import com.fossgalaxy.games.fireworks.utils.AgentUtils;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.ActionType;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.Clue;
 import net.rmelick.hanabi.bot.live.connector.schemas.java.ClueType;
@@ -40,6 +41,7 @@ public class LiveGameRunner {
     private static final Logger LOG = Logger.getLogger(LiveGameRunner.class.getName());
     private static final int[] HAND_SIZE = {-1, -1, 5, 5, 4, 4};
     public static final int SYSTEM_PLAYER_ID = -2;
+    private static final long MIN_TURN_DURATION_MS = 2000;
 
     private final Player _myPlayer;
     private final String _myHanabiLivePlayerName;
@@ -50,9 +52,9 @@ public class LiveGameRunner {
     private final CountDownLatch _initCompleted = new CountDownLatch(1);
     //private BlockingQueue<Notify> _pendingStrikes = new LinkedBlockingQueue<>();
 
-    public LiveGameRunner(String hanabiLivePlayerName) {
+    public LiveGameRunner(String hanabiLivePlayerName, String botAgentName) {
         _myHanabiLivePlayerName = hanabiLivePlayerName;
-        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, IGGIFactory.buildIGGI2Player());
+        _myPlayer = new AgentPlayer(_myHanabiLivePlayerName, AgentUtils.buildAgent(botAgentName));
     }
 
     public void init(Init initMessage) {
@@ -327,6 +329,7 @@ public class LiveGameRunner {
     }
 
     public net.rmelick.hanabi.bot.live.connector.schemas.java.Action getNextPlayerMove() {
+        long turnStart = System.currentTimeMillis();
         try {
             boolean success = _initCompleted.await(2, TimeUnit.MINUTES);
             if (!success && _initCompleted.getCount() > 0) {
@@ -337,7 +340,16 @@ public class LiveGameRunner {
             throw new IllegalStateException("Timeout waiting for spectator to initialize GameRunner", e);
         }
         Action nextAction = _myPlayer.getAction();
-        return convertIEEEActionToHanabiLive(nextAction);
+        net.rmelick.hanabi.bot.live.connector.schemas.java.Action liveAction = convertIEEEActionToHanabiLive(nextAction);
+        long delayForRealisticTurnLength = MIN_TURN_DURATION_MS - (System.currentTimeMillis() - turnStart);
+        if (delayForRealisticTurnLength > 0) {
+            LOG.info("Sleeping for %s to mimic realistic turn length");
+            try {
+                Thread.sleep(delayForRealisticTurnLength);
+            } catch (InterruptedException ignored) {
+            }
+        }
+        return liveAction;
     }
 
     private net.rmelick.hanabi.bot.live.connector.schemas.java.Action convertIEEEActionToHanabiLive(Action action) {

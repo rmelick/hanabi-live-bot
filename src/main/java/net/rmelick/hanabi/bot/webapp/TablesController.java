@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 @Controller
@@ -22,12 +23,10 @@ public class TablesController {
 
 	@PostConstruct
 	public void init() {
-		_botsList.init();
 		try {
+			_botsList.init();
 			_client.connectWebsocket();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (InterruptedException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | IOException | NoSuchFieldException e) {
 			e.printStackTrace();
 		}
 	}
@@ -35,7 +34,7 @@ public class TablesController {
 	@GetMapping("/tables")
 	public String tables(Model model) {
 		model.addAttribute("tables", _client.getWorldState().getCurrentTables());
-		model.addAttribute("bots", BotsList.SUPPORTED_BOTS.keySet());
+		model.addAttribute("bots", _botsList.getAvailableBots());
 		return "tables";
 	}
 
@@ -43,7 +42,7 @@ public class TablesController {
 	public String join(@RequestParam Long tableID, @RequestParam String password, @RequestParam String bot) {
 		System.out.println(String.format("Attempting to join game %s with bot %s password %s", tableID, bot, password));
 		try {
-			_gamesManager.joinGame(tableID, password);
+			_gamesManager.joinGame(tableID, password, bot);
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ActiveGamesManager {
     private final Map<Long, ActiveGame> _activeGames = new ConcurrentHashMap<>();
 
-    public void joinGame(Long gameID, String password) throws IOException, InterruptedException {
-        ActiveGame activeGame = new ActiveGame(gameID, password);
+    public void joinGame(Long gameID, String password, String botAgentName) throws IOException, InterruptedException {
+        ActiveGame activeGame = new ActiveGame(gameID, password, botAgentName);
         _activeGames.put(gameID, activeGame);
         activeGame.init();
     }
