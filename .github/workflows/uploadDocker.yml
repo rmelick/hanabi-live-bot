@@ -47,11 +47,11 @@ jobs:
           --tag "gcr.io/$RUN_PROJECT_ID/$RUN_SERVICE_NAME:$GITHUB_SHA"
 
     # Deploy image to Cloud Run
-#    - name: Deploy
-#     run: |-
-#       gcloud run deploy "$SERVICE_NAME" \
-#         --quiet \
-#         --region "$RUN_REGION" \
-#         --image "gcr.io/$RUN_PROJECT_ID/$RUN_SERVICE_NAME:$GITHUB_SHA" \
-#         --platform "managed" \
-#         --allow-unauthenticated
+    - name: Deploy
+     run: |-
+       gcloud run deploy "$SERVICE_NAME" \
+         --quiet \
+         --region "$RUN_REGION" \
+         --image "gcr.io/$RUN_PROJECT_ID/$RUN_SERVICE_NAME:$GITHUB_SHA" \
+         --platform "managed" \
+         --allow-unauthenticated
