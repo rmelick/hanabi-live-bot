@@ -1,6 +1,6 @@
 package net.rmelick.hanabi.bot.webapp;
 
-import net.rmelick.hanabi.bot.ieee.Bots;
+import net.rmelick.hanabi.bot.ieee.BotsList;
 import net.rmelick.hanabi.bot.live.connector.ActiveGamesManager;
 import net.rmelick.hanabi.bot.live.connector.HanabiLobbyClient;
 import org.springframework.stereotype.Controller;
@@ -18,9 +18,11 @@ public class TablesController {
 	private static final Logger LOG = Logger.getLogger(TablesController.class.getName());
 	private final ActiveGamesManager _gamesManager = new ActiveGamesManager();
 	private final HanabiLobbyClient _client = new HanabiLobbyClient(_gamesManager);
+	private final BotsList _botsList = new BotsList();
 
 	@PostConstruct
 	public void init() {
+		_botsList.init();
 		try {
 			_client.connectWebsocket();
 		} catch (InterruptedException e) {
@@ -33,7 +35,7 @@ public class TablesController {
 	@GetMapping("/tables")
 	public String tables(Model model) {
 		model.addAttribute("tables", _client.getWorldState().getCurrentTables());
-		model.addAttribute("bots", Bots.SUPPORTED_BOTS.keySet());
+		model.addAttribute("bots", BotsList.SUPPORTED_BOTS.keySet());
 		return "tables";
 	}
 
