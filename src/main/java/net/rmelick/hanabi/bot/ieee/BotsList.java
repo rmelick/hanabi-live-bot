@@ -29,6 +29,7 @@ public class BotsList {
         Method scanMethod = clazz.getDeclaredMethod("scanForAgents");
         scanMethod.setAccessible(true);
         scanMethod.invoke(_agentFinder);
+        // TODO figure out why this doesn't work inside of Docker and it only shows a small set
         _supportedBots.addAll(filterForNoArgAgents(_agentFinder.getFactories().values()));
     }
 
