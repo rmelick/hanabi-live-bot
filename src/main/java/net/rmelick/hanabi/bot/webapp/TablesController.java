@@ -31,7 +31,7 @@ public class TablesController {
 		}
 	}
 
-	@GetMapping("/tables")
+	@GetMapping("/")
 	public String tables(Model model) {
 		model.addAttribute("tables", _client.getWorldState().getCurrentTables());
 		model.addAttribute("bots", _botsList.getAvailableBots());
@@ -46,6 +46,6 @@ public class TablesController {
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		return "redirect:/tables";
+		return "redirect:/";
 	}
 }
