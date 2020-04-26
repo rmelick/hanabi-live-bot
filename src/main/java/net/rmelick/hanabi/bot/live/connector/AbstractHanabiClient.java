@@ -38,6 +38,7 @@ public class AbstractHanabiClient {
         Map<String, Object> data = new HashMap<>();
         data.put("username", _username);
         data.put("password", _password);
+        data.put("version", 3038); // "bot" should be supported but is not yet
 
         CookieManager cookieManager = new CookieManager(new InMemoryNoMaxCookieStore(),
                 CookiePolicy.ACCEPT_ORIGINAL_SERVER);

@@ -1,7 +1,8 @@
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '2.0.4.RELEASE'
-  id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+  id 'org.springframework.boot' version '2.2.6.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+  id 'com.google.cloud.tools.jib' version '2.2.0'
 }
 
 group 'net.rmelick'
@@ -14,20 +15,35 @@ repositories {
 }
 
 dependencies {
-  compile('org.springframework.boot:spring-boot-starter')
-  compile 'org.springframework.boot:spring-boot-starter-web'
-  compile 'org.springframework:spring-websocket'
-  compile 'org.springframework:spring-messaging'
-  compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
-  compile group: 'org.glassfish.tyrus', name: 'tyrus-client', version: '1.16'
-  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0'
-  compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
-  compile(group: 'com.fossgalaxy.games', name: 'fireworks', version: '0.2.4') {
+  implementation('org.springframework.boot:spring-boot-starter')
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework:spring-websocket'
+  implementation 'org.springframework:spring-messaging'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation group: 'org.glassfish.tyrus', name: 'tyrus-client', version: '1.16'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0'
+  implementation group: 'commons-codec', name: 'commons-codec', version: '1.11'
+  implementation(group: 'com.fossgalaxy.games', name: 'fireworks', version: '0.2.4') {
     exclude group: 'org.slf4j', module: 'slf4j-simple'
   }
-  runtime group: 'org.glassfish.tyrus', name: 'tyrus-container-grizzly-client', version: '1.16'
-  runtime 'org.springframework.boot:spring-boot-devtools'
-  testCompile('org.springframework.boot:spring-boot-starter-test')
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.1'
-  testCompile group: 'junit', name: 'junit', version: '4.12'
+  runtimeOnly group: 'org.glassfish.tyrus', name: 'tyrus-container-grizzly-client', version: '1.16'
+  runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+  testImplementation('org.springframework.boot:spring-boot-starter-test')
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.1'
+  testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+
+jib {
+  to {
+    image = "gcr.io/${System.getenv('RUN_PROJECT_ID')}/${System.getenv('RUN_SERVICE_NAME')}:${System.getenv('GITHUB_SHA')}"
+    def localCredsFile = System.getenv('LOCAL_SERVICE_ACCOUNT_CREDS')
+    if (localCredsFile != null) {
+      auth {
+        username = '_json_key'
+        password = file(localCredsFile).text
+      }
+    }
+
+  }
 }
