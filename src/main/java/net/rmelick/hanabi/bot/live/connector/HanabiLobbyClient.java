@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class HanabiLobbyClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiLobbyClient.class.getName());
 
-    private final ObjectMapper _objectMapper = new ObjectMapper();
+    private final ObjectMapper _objectMapper = HanabiObjectMapper.getObjectMapper();
     private final WorldState _worldState = new WorldState();
 
     // TODO temp for easy debugging

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CommandParser {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = HanabiObjectMapper.getObjectMapper();
 
     public static ParsedCommand parseCommand(String commandAndBody) {
         String[] pieces = commandAndBody.split(" ", 2);

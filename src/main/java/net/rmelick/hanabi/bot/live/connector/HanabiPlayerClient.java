@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 public class HanabiPlayerClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiPlayerClient.class.getName());
 
-    private final ObjectMapper _objectMapper = new ObjectMapper();
+    private final ObjectMapper _objectMapper = HanabiObjectMapper.getObjectMapper();
     private final Long _gameID;
     private final String _gamePassword;
     private final LiveGameRunner _liveGameRunner;

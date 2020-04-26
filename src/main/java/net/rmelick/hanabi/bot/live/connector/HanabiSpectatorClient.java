@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class HanabiSpectatorClient extends AbstractHanabiClient {
     private static final Logger LOG = Logger.getLogger(HanabiSpectatorClient.class.getName());
 
-    private final ObjectMapper _objectMapper = new ObjectMapper();
+    private final ObjectMapper _objectMapper = HanabiObjectMapper.getObjectMapper();
     private final AtomicBoolean _alreadySpectating = new AtomicBoolean(false);
     private final Long _gameID;
     private final LiveGameRunner _liveGameRunner;
