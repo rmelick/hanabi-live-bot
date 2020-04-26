@@ -1,0 +1,170 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "type": "array",
+    "items": {
+        "$ref": "#/definitions/NotifyListUnion"
+    },
+    "definitions": {
+        "NotifyListClass": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "$ref": "#/definitions/Type"
+                },
+                "who": {
+                    "type": "integer"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "suit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "clues": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "maxScore": {
+                    "type": "integer"
+                },
+                "doubleDiscard": {
+                    "type": "boolean"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "num": {
+                    "type": "integer"
+                },
+                "turn": {
+                    "type": "integer"
+                },
+                "failed": {
+                    "type": "boolean"
+                },
+                "which": {
+                    "$ref": "#/definitions/Which"
+                },
+                "clue": {
+                    "$ref": "#/definitions/Clue"
+                },
+                "giver": {
+                    "type": "integer"
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "target": {
+                    "type": "integer"
+                },
+                "deck": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Deck"
+                    }
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "title": "NotifyListClass"
+        },
+        "Clue": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "type",
+                "value"
+            ],
+            "title": "Clue"
+        },
+        "Deck": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "suit": {
+                    "type": "integer"
+                },
+                "rank": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "rank",
+                "suit"
+            ],
+            "title": "Deck"
+        },
+        "Which": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "index": {
+                    "type": "integer"
+                },
+                "suit": {
+                    "type": "integer"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "index",
+                "order",
+                "rank",
+                "suit"
+            ],
+            "title": "Which"
+        },
+        "NotifyListUnion": {
+            "anyOf": [
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NotifyListClass"
+                    }
+                },
+                {
+                    "$ref": "#/definitions/NotifyListClass"
+                }
+            ],
+            "title": "NotifyListUnion"
+        },
+        "Type": {
+            "type": "string",
+            "enum": [
+                "draw",
+                "status",
+                "text",
+                "turn",
+                "strike",
+                "discard",
+                "play",
+                "clue",
+                "deckOrder"
+            ],
+            "title": "Type"
+        }
+    }
+}

@@ -1,8 +1,11 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "$ref": "#/definitions/Table",
+    "type": "array",
+    "items": {
+        "$ref": "#/definitions/TableListElement"
+    },
     "definitions": {
-        "Table": {
+        "TableListElement": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -28,7 +31,7 @@
                     "type": "boolean"
                 },
                 "variant": {
-                    "type": "string"
+                    "$ref": "#/definitions/Variant"
                 },
                 "timed": {
                     "type": "boolean"
@@ -49,7 +52,7 @@
                     "type": "string"
                 },
                 "spectators": {
-                    "type": "string"
+                    "$ref": "#/definitions/Spectators"
                 }
             },
             "required": [
@@ -69,7 +72,29 @@
                 "timed",
                 "variant"
             ],
-            "title": "Table"
+            "title": "TableListElement"
+        },
+        "Spectators": {
+            "type": "string",
+            "enum": [
+                "-",
+                "Ana97",
+                "nathalie3593, The Kaito Kid, marcogilbert",
+                "bighits2000, jpops",
+                "kd, sc1288, Shru, khushi",
+                "a4coleman, trippy_mcfly"
+            ],
+            "title": "Spectators"
+        },
+        "Variant": {
+            "type": "string",
+            "enum": [
+                "No Variant",
+                "6 Suits",
+                "Rainbow (6 Suits)",
+                "Black (6 Suits)"
+            ],
+            "title": "Variant"
         }
     }
 }

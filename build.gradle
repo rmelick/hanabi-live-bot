@@ -51,3 +51,59 @@ jib {
 
   }
 }
+
+// TODO make 1 grade task per input schema?  to better pick up changes?
+task('generateCodeFromJsonSchema', type: Exec) {
+  workingDir = 'src/main/java/net/rmelick/hanabi/bot/live/connector/schemas'
+  commandLine = 'bash'
+  args = [
+          '-c',
+          'ls jsonschema | sed \'s|.schema.json||\' | xargs -I % bash -c ' +
+                  '\'quicktype' +
+                  ' --lang java' +
+                  ' --src-lang schema' +
+                  ' --package net.rmelick.hanabi.bot.live.connector.schemas.java2' +
+                  ' --array-type list' +
+                  ' --acronym-style pascal' +
+                  ' --src jsonschema/%.schema.json' +
+                  ' --out java2/%.java\''
+  ]
+
+
+  inputs.dir('src/main/java/net/rmelick/hanabi/bot/live/connector/schemas/jsonschema')
+  outputs.dir('src/generated/net/rmelick/hanabi/bot/live/connector/schemas/java2/')
+}
+
+
+task('generateJsonSchemaFromSamples', type: Exec) {
+  workingDir = 'src/main/java/net/rmelick/hanabi/bot/live/connector/schemas'
+  commandLine = 'bash'
+  args = [
+          '-c',
+          'ls json | xargs -I % bash -c \'quicktype --lang schema --src-lang json --top-level % --src json/%/* --out jsonschema/%.schema.json\''
+  ]
+  workingDir = 'src/main/java/net/rmelick/hanabi/bot/live/connector/schemas'
+  inputs.dir('src/main/java/net/rmelick/hanabi/bot/live/connector/schemas/json')
+  outputs.dir('src/generated/net/rmelick/hanabi/bot/live/connector/schemas/jsonschema')
+}
+
+
+
+
+task('generateCodeFromJsonSchemaOld', type: Exec) {
+  workingDir = 'src/main/java/net/rmelick/hanabi/bot/live/connector/schemas'
+  commandLine = 'quicktype'
+  args = [
+          '--lang',  'java',
+          '--src-lang', 'schema',
+          '--package', 'net.rmelick.hanabi.bot.live.connector.schemas.java',
+          '--array-type', 'list',
+          '--acronym-style', 'pascal',
+          '--src', 'jsonschema',
+          //'--top-level', 'Hello'
+          '--out', 'java2/Types.java'
+  ]
+
+  inputs.dir('src/main/java/net/rmelick/hanabi/bot/live/connector/schemas/jsonschema')
+  //outputs.dir('src/generated/net/rmelick/hanabi/bot/live/connector/schemas/java2/')
+}

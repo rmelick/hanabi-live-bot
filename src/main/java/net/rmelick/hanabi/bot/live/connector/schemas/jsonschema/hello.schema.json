@@ -1,0 +1,148 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/Hello",
+    "definitions": {
+        "Hello": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "totalGames": {
+                    "type": "integer"
+                },
+                "admin": {
+                    "type": "boolean"
+                },
+                "muted": {
+                    "type": "boolean"
+                },
+                "firstTimeUser": {
+                    "type": "boolean"
+                },
+                "settings": {
+                    "$ref": "#/definitions/Settings"
+                },
+                "version": {
+                    "type": "integer"
+                },
+                "shuttingDown": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "admin",
+                "firstTimeUser",
+                "id",
+                "muted",
+                "settings",
+                "shuttingDown",
+                "totalGames",
+                "username",
+                "version"
+            ],
+            "title": "Hello"
+        },
+        "Settings": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "soundMove": {
+                    "type": "boolean"
+                },
+                "soundTimer": {
+                    "type": "boolean"
+                },
+                "keldonMode": {
+                    "type": "boolean"
+                },
+                "colorblindMode": {
+                    "type": "boolean"
+                },
+                "realLifeMode": {
+                    "type": "boolean"
+                },
+                "reverseHands": {
+                    "type": "boolean"
+                },
+                "styleNumbers": {
+                    "type": "boolean"
+                },
+                "showTimerInUntimed": {
+                    "type": "boolean"
+                },
+                "volume": {
+                    "type": "integer"
+                },
+                "speedrunPreplay": {
+                    "type": "boolean"
+                },
+                "speedrunMode": {
+                    "type": "boolean"
+                },
+                "hyphenatedConventions": {
+                    "type": "boolean"
+                },
+                "createTableVariant": {
+                    "type": "string"
+                },
+                "createTableTimed": {
+                    "type": "boolean"
+                },
+                "createTableBaseTimeMinutes": {
+                    "type": "integer"
+                },
+                "createTableTimePerTurnSeconds": {
+                    "type": "integer"
+                },
+                "createTableSpeedrun": {
+                    "type": "boolean"
+                },
+                "createTableCardCycle": {
+                    "type": "boolean"
+                },
+                "createTableDeckPlays": {
+                    "type": "boolean"
+                },
+                "createTableEmptyClues": {
+                    "type": "boolean"
+                },
+                "createTableCharacterAssignments": {
+                    "type": "boolean"
+                },
+                "createTableAlertWaiters": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "colorblindMode",
+                "createTableAlertWaiters",
+                "createTableBaseTimeMinutes",
+                "createTableCardCycle",
+                "createTableCharacterAssignments",
+                "createTableDeckPlays",
+                "createTableEmptyClues",
+                "createTableSpeedrun",
+                "createTableTimePerTurnSeconds",
+                "createTableTimed",
+                "createTableVariant",
+                "hyphenatedConventions",
+                "keldonMode",
+                "realLifeMode",
+                "reverseHands",
+                "showTimerInUntimed",
+                "soundMove",
+                "soundTimer",
+                "speedrunMode",
+                "speedrunPreplay",
+                "styleNumbers",
+                "volume"
+            ],
+            "title": "Settings"
+        }
+    }
+}

@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/Notify",
+    "definitions": {
+        "Notify": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "clue": {
+                    "$ref": "#/definitions/Clue"
+                },
+                "giver": {
+                    "type": "integer"
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "target": {
+                    "type": "integer"
+                },
+                "turn": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "clues": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "maxScore": {
+                    "type": "integer"
+                },
+                "doubleDiscard": {
+                    "type": "boolean"
+                },
+                "num": {
+                    "type": "integer"
+                },
+                "who": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "title": "Notify"
+        },
+        "Clue": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "type",
+                "value"
+            ],
+            "title": "Clue"
+        }
+    }
+}
