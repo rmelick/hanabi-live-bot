@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Upload docker
+name: Build and deploy to google cloud
 
 on:
   push:
@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-
+    name: Build and push
     runs-on: ubuntu-latest
 
     steps:

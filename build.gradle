@@ -41,11 +41,11 @@ jib {
   }
   to {
     image = "gcr.io/${System.getenv('RUN_PROJECT_ID')}/${System.getenv('RUN_SERVICE_NAME')}:${System.getenv('GITHUB_SHA')}"
-    def localCredsFile = System.getenv('RUN_SERVICE_ACCOUNT_KEY')
-    if (localCredsFile != null) {
+    def localCreds = System.getenv('RUN_SERVICE_ACCOUNT_KEY')
+    if (localCreds != null) {
       auth {
         username = '_json_key'
-        password = file(localCredsFile).text
+        password = localCreds
       }
     }
 
