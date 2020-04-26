@@ -35,9 +35,13 @@ dependencies {
 
 
 jib {
+  from {
+    // latest 11 image as of April 25 2020
+    image = "gcr.io/distroless/java@sha256:c94feda039172152495b5cd60a350a03162fce4f8986b560ea555de4d276ce19"
+  }
   to {
     image = "gcr.io/${System.getenv('RUN_PROJECT_ID')}/${System.getenv('RUN_SERVICE_NAME')}:${System.getenv('GITHUB_SHA')}"
-    def localCredsFile = System.getenv('LOCAL_SERVICE_ACCOUNT_CREDS')
+    def localCredsFile = System.getenv('RUN_SERVICE_ACCOUNT_KEY')
     if (localCredsFile != null) {
       auth {
         username = '_json_key'
