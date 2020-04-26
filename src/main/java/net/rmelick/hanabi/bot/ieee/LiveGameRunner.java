@@ -312,6 +312,7 @@ public class LiveGameRunner {
         Long giverID = event.getGiver();
         List<GameEvent> resultingEvents = clueAction.apply(giverID.intValue(), _gameState);
         _myPlayer.resolveTurn(giverID.intValue(), clueAction, resultingEvents);
+        // TODO seems like num clues remaining isn't updated properly
         return true;
     }
 
